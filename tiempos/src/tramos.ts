@@ -19,8 +19,9 @@ export interface Commit {
 // Excepciones que la regla automática no resuelve (asignaciones.json, opcional).
 // Claves de mensajes y esperas: marca de tiempo ISO (UTC) del mensaje humano, tal como aparece en el JSONL.
 export interface Asignaciones {
-  // Mensaje humano sin identificador que abre un item.
-  mensajes: Record<string, string>
+  // Mensaje humano sin identificador que abre un item, o null: el mensaje no es de este plan (por ejemplo, de otro
+  // proyecto cuya carpeta de sesiones también se lee). No abre nada y cierra el item abierto.
+  mensajes: Record<string, string | null>
   // Subagente (id del archivo agent-<id>.jsonl) que trabajó para varios items.
   subagentes: Record<string, string[]>
   // Mensaje humano que cierra una espera por un pedido de acción (por ejemplo, un comando con sudo), con su motivo.
@@ -68,7 +69,9 @@ function asignarTurnos(
     const excepcion = asignaciones.mensajes[iso(h.at)]
     const id = identificador.exec(h.firstLine)?.[1]
     let item: string | null = null
-    if (excepcion !== undefined) {
+    if (excepcion === null) {
+      abierto = null
+    } else if (excepcion !== undefined) {
       if (items.has(excepcion)) item = excepcion
       else sinAsignar.push({ at: h.at, firstLine: h.firstLine, motivo: `asignaciones.json apunta a ${excepcion}, que no existe en plan.json` })
     } else if (id !== undefined) {

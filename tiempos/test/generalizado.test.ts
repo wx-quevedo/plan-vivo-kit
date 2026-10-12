@@ -118,3 +118,39 @@ describe('carpeta de sesiones de Claude Code', () => {
     expect(() => carpetaDeSesiones('c:/otro', base)).toThrow(/usa --sesiones/)
   })
 })
+
+describe('mensajes excluidos (null en asignaciones.json)', () => {
+  it('un mensaje de otro proyecto con un id que choca no abre ese item, y lo que sigue sin identificador queda sin asignar', () => {
+    const asignaciones = { ...SIN_ASIGNACIONES, mensajes: { [Z('10:00')]: null } }
+    const p = proponer({
+      eventos: eventos([humano('10:00', 'F1 · P2: de otro proyecto'), agente('10:10'), humano('10:20', 'sigue sin id'), agente('10:30'), humano('11:00', 'F1 · P2: este sí'), agente('11:15')]),
+      subagentes: [],
+      commits: [],
+      asignaciones,
+      items: new Set(['P2']),
+    })
+    expect(p.porItem.get('P2')?.map((t) => [t.start, t.end])).toEqual([[Date.parse(Z('11:00')), Date.parse(Z('11:15'))]])
+    expect(p.sinAsignar.map((s) => s.motivo)).toEqual(['sin identificador y sin item abierto'])
+  })
+
+  it('null también cierra el item que estaba abierto', () => {
+    const asignaciones = { ...SIN_ASIGNACIONES, mensajes: { [Z('10:20')]: null } }
+    const p = proponer({
+      eventos: eventos([humano('10:00', 'F1 · P1: algo'), agente('10:10'), humano('10:20', 'otro proyecto'), agente('10:25'), humano('10:40', 'sin id'), agente('10:45')]),
+      subagentes: [],
+      commits: [],
+      asignaciones,
+      items: new Set(['P1']),
+    })
+    expect(p.porItem.get('P1')).toHaveLength(1)
+    expect(p.sinAsignar).toHaveLength(1)
+  })
+
+  it('leerAsignaciones acepta null en mensajes y lo rechaza en esperas', () => {
+    const ruta = join(dir(), 'asignaciones.json')
+    writeFileSync(ruta, JSON.stringify({ mensajes: { [Z('10:00')]: null } }))
+    expect(leerAsignaciones(ruta).mensajes).toEqual({ [Z('10:00')]: null })
+    writeFileSync(ruta, JSON.stringify({ esperas: { [Z('10:00')]: null } }))
+    expect(() => leerAsignaciones(ruta)).toThrow(/esperas\.2026-10-11T10:00:00\.000Z debe ser un texto$/)
+  })
+})

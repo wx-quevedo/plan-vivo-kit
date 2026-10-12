@@ -203,6 +203,7 @@ Revísala antes de aplicar:
 ```
 
 - **mensajes:** un mensaje sin identificador que abre otro item. La clave es la marca de tiempo UTC del mensaje en el JSONL, la misma que muestra la línea «Sin asignar».
+  Con `null` en lugar del id, el mensaje se excluye: no abre ningún item y cierra el que estaba abierto. Sirve cuando se lee la carpeta de sesiones de otro proyecto (`--sesiones` repetido) y un mensaje de ese proyecto trae un identificador que también existe en este plan, por ejemplo su propio «F1 · P2:».
 - **subagentes:** un subagente que trabajó para varios items, por el id de su archivo `agent-<id>.jsonl`.
 - **esperas:** un mensaje de la persona que cierra una espera por un pedido de acción hecho sin AskUserQuestion. El hueco anterior pasa a ser un tramo `human`.
 

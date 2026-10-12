@@ -93,11 +93,14 @@ export function leerAsignaciones(ruta: string): Asignaciones {
   }
   for (const campo of ['mensajes', 'esperas'] as const) {
     for (const [clave, valor] of Object.entries(objeto[campo] as object)) {
-      if (typeof valor !== 'string') throw new Error(`${ruta}: ${campo}.${clave} debe ser un texto`)
+      // En mensajes, null excluye el mensaje (no es de este plan).
+      if (typeof valor !== 'string' && !(campo === 'mensajes' && valor === null)) {
+        throw new Error(`${ruta}: ${campo}.${clave} debe ser un texto${campo === 'mensajes' ? ' o null' : ''}`)
+      }
     }
   }
   for (const [clave, valor] of Object.entries(objeto.subagentes as object)) {
     if (!Array.isArray(valor) || !valor.every((v) => typeof v === 'string')) throw new Error(`${ruta}: subagentes.${clave} debe ser una lista de items`)
   }
-  return { mensajes: objeto.mensajes as Record<string, string>, subagentes: objeto.subagentes as Record<string, string[]>, esperas: objeto.esperas as Record<string, string> }
+  return { mensajes: objeto.mensajes as Record<string, string | null>, subagentes: objeto.subagentes as Record<string, string[]>, esperas: objeto.esperas as Record<string, string> }
 }

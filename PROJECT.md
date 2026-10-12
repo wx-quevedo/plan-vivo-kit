@@ -47,6 +47,10 @@ Aprobadas por Washington el 2026-10-12.
   - `schema_version` y `pnpm migrar`; migración 0 a 1 aplicada al plan del kit y a las dos plantillas de `ejemplos/`.
   - README.md, AGENTES.md (secciones 8 y 9 nuevas) y snippet-claude.md al modelo de una sola instalación.
   - La prueba e2e que copiaba el kit a una carpeta vacía se reemplazó por una que abre el visor desde la carpeta de otro proyecto con `pnpm --dir`, con un plan fuera del kit (K1 prohíbe copiarlo).
+  - `null` en `asignaciones.mensajes`: excluye un mensaje que no es de este plan y cierra el item abierto (imprevisto, ver «Problemas»).
+  - Pruebas: 55 de tiempos, 85 del visor y 9 e2e, todas en verde (antes: 30, 70 y 8). 38 mutaciones de las funciones nuevas en rojo por aserción y en verde al restaurar. Las 5 que sobrevivieron en la primera ronda (rutas inexistentes de tiempos y migrar, origen de variable, lista de sesiones con texto vacío) tienen ahora su prueba.
+  - Verificación con Monitor, en solo lectura: visor con `--plan C:\xampp\htdocs\server-monitor\plan.json` desde otra carpeta (captura en `docs/verificacion/visor-monitor-desde-kit.png`, fuera del zip) y `pnpm tiempos` sin `--aplicar`, con sus asignaciones de `scripts/tiempos/`: tabla idéntica a la de antes de P2, 95 tramos «igual». El sha256 del plan de Monitor es el mismo antes y después (29713a88…8dad).
+  - `npx autoskills --dry-run`: detectó TypeScript, Node.js, React, Zod, Playwright, Vite y Vitest, y propuso 12 skills. No se instaló nada.
 
 ## 4. Problemas y resoluciones
 
@@ -56,6 +60,10 @@ Aprobadas por Washington el 2026-10-12.
 - 2026-10-12 — En Windows, pnpm 11 pasa los argumentos con las barras invertidas duplicadas (`C:\a\plan.json` llega como `C:\\a\\plan.json`). Los mensajes mostraban la ruta así. Resolución: toda ruta pasa por `path.resolve`, que la normaliza.
 - 2026-10-12 — `pnpm tiempos` fallaba en un repositorio git recién creado, sin commits, porque `git log` da error. Un proyecto nuevo que empieza su plan antes del primer commit caía ahí. Resolución: sin `HEAD`, no hay commits que asignar.
 - 2026-10-12 — `pnpm migrar --aplicar` escribe con el mismo formato que `tiempos --aplicar`. Sobre `ejemplos/plan.json`, escrito a mano con otro formato, cambiaba 150 líneas. Resolución: en la plantilla se hizo el cambio de una línea a mano; en los planes de los proyectos no importa, porque `tiempos --aplicar` ya los escribe con ese formato.
+
+- 2026-10-12 — Al cargar los tramos de P2 leyendo las dos carpetas de sesiones (la de Monitor, donde quedó F0, y la del kit), el mensaje «F1 · P2:» de Monitor del 11 oct abría el P2 del kit, y decenas de mensajes de Monitor sin identificador caían en él. Resolución: `null` en `asignaciones.mensajes` excluye el mensaje y cierra el item abierto; el kit lo usa para ese mensaje.
+- 2026-10-12 — El primer mensaje de esta sesión empieza con un bloque pegado, no con «F1 · P2:», y tiempos lo asignaba a P1. Resolución: entrada en `asignaciones.json`. Para los próximos encargos, conviene que el identificador vaya en la primera línea, antes del bloque pegado.
+- 2026-10-12 — Al probar desde bash, un `--plan C:\xampp\...` sin comillas perdió las barras antes de llegar a pnpm. No es del kit (el mensaje de ruta inexistente lo mostró bien); desde PowerShell funciona tal cual.
 
 ## 5. Próximos pasos
 

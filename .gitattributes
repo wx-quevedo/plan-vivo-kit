@@ -1,3 +1,5 @@
 # El plan propio del kit no viaja en el zip (pnpm zip usa git archive): quien instala el kit trae su propio plan.json.
 /plan.json export-ignore
 /asignaciones.json export-ignore
+# Capturas de verificación con planes de otros proyectos: quedan en el repositorio, no en el zip.
+/docs/verificacion export-ignore

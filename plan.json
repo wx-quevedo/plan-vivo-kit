@@ -1,9 +1,9 @@
 {
   "$schema": "schema/plan.schema.json",
-  "schema": 1,
+  "schema_version": 1,
   "project": "plan-vivo",
   "title": "Plan vivo (kit)",
-  "updated_at": "2026-10-12T09:55:00-05:00",
+  "updated_at": "2026-10-12T10:35:00-05:00",
   "phases": [
     {
       "id": "F0",
@@ -27,9 +27,9 @@
             {
               "actor": "coding_agent",
               "start": "2026-10-12T09:40:37-05:00",
-              "end": "2026-10-12T09:42:05-05:00",
+              "end": "2026-10-12T09:42:31-05:00",
               "note": "",
-              "commits": ["b9aef66"]
+              "commits": ["b9aef66", "5b486ce"]
             }
           ],
           "summary": "Repositorio nuevo con el visor independiente, el script de tiempos generalizado, el esquema, el ejemplo, las guías y el zip.",
@@ -55,14 +55,38 @@
           "id": "P2",
           "type": "prompt",
           "title": "plan-vivo usable desde cualquier proyecto, sin copiarlo",
-          "status": "in_progress",
+          "status": "done",
           "estimate_min": [40, 70],
           "difficulty": 6,
-          "work_log": [],
-          "summary": "",
-          "steps": [],
-          "files_changed": 0,
-          "notes": ""
+          "work_log": [
+            {
+              "actor": "coding_agent",
+              "start": "2026-10-12T09:53:55-05:00",
+              "end": "2026-10-12T10:31:45-05:00",
+              "note": "",
+              "commits": ["0a68d0b", "7f9b717", "e941c66", "9629a72", "30bac41"]
+            },
+            {
+              "actor": "subagent",
+              "start": "2026-10-12T10:07:35-05:00",
+              "end": "2026-10-12T10:25:23-05:00",
+              "note": "subagente a31fe521",
+              "commits": []
+            }
+          ],
+          "summary": "El kit se usa desde cualquier proyecto sin copiarlo: --plan, --sesiones repetible y --asignaciones con pnpm --dir, schema_version con pnpm migrar, y CLAUDE.md, PROJECT.md y PENDIENTES.md.",
+          "steps": [
+            "Decisiones K1 a K6 en PROJECT.md; CLAUDE.md del kit; PENDIENTES.md con la entrada del horario de verano",
+            "Rutas: -- ignorado, barras duplicadas de pnpm 11 normalizadas, --sesiones repetible, mensaje claro si una ruta no existe",
+            "schema_version (actual 1) y pnpm migrar con .bak; migración 0 a 1 aplicada al plan del kit y a las plantillas",
+            "tiempos: repositorio sin commits y null en asignaciones.mensajes para excluir mensajes de otro proyecto",
+            "README.md, AGENTES.md (secciones 8 y 9) y snippet-claude.md con la regla K4",
+            "Pruebas: 55 de tiempos, 85 del visor, 9 e2e (plan fuera del kit con pnpm --dir); 38 mutaciones en rojo por aserción",
+            "Monitor en solo lectura: visor con su plan (captura) y tabla de tiempos idéntica, 95 igual; sha256 sin cambios",
+            "autoskills --dry-run: 12 skills propuestas, nada instalado; zip regenerado sin plan, asignaciones, .bak ni node_modules"
+          ],
+          "files_changed": 32,
+          "notes": "Imprevisto dentro de P2: al leer también la carpeta de sesiones de Monitor, su mensaje «F1 · P2:» del 11 oct chocaba con el P2 del kit; se agregó null en asignaciones.mensajes. El primer mensaje de esta sesión empieza con un bloque pegado, sin identificador: va a P2 por asignaciones.json. Falta que Washington confirme los detalles del incidente de la carpeta borrada."
         }
       ]
     }

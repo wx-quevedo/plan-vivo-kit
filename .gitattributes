@@ -1,0 +1,3 @@
+# El plan propio del kit no viaja en el zip (pnpm zip usa git archive): quien instala el kit trae su propio plan.json.
+/plan.json export-ignore
+/asignaciones.json export-ignore

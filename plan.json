@@ -1,0 +1,36 @@
+{
+  "$schema": "schema/plan.schema.json",
+  "schema": 1,
+  "project": "plan-vivo",
+  "title": "Plan vivo (kit)",
+  "updated_at": "2026-10-12T09:50:00-05:00",
+  "phases": [
+    {
+      "id": "F0",
+      "name": "Kit inicial",
+      "items": [
+        {
+          "id": "P1",
+          "type": "prompt",
+          "title": "Exportar el plan vivo de server-monitor como kit reutilizable",
+          "status": "done",
+          "estimate_min": null,
+          "difficulty": 6,
+          "work_log": [],
+          "summary": "Repositorio nuevo con el visor independiente, el script de tiempos generalizado, el esquema, el ejemplo, las guías y el zip.",
+          "steps": [
+            "Visor copiado de Monitor como app React + Vite: plan.json por ruta configurable, recarga al guardar, ES/EN",
+            "Script de tiempos generalizado: configuración, zona horaria, identificador, asignaciones.json opcional",
+            "schema/plan.schema.json probado en paralelo con zod; ejemplos/plan.json y plan-inicial.json",
+            "README.md, AGENTES.md, snippet-claude.md y capturas en docs/capturas/",
+            "Pruebas: 70 del visor, 30 de tiempos, 8 e2e (incluye el kit copiado a una carpeta vacía); 23 mutaciones en rojo",
+            "Zip plan-vivo-kit.zip verificado; nota y decisión D37 en PROJECT.md de server-monitor",
+            "Plan propio del kit (este archivo) con sus tramos cargados por pnpm tiempos"
+          ],
+          "files_changed": 76,
+          "notes": "Sin estimado previo: fue una tarea aparte, fuera del plan de server-monitor. Defectos encontrados y corregidos: la recarga perdía el segundo de dos guardados seguidos en Windows (ahora fs.watchFile), y --aplicar borraba los tramos del orquestador (ahora se conservan). La sesión de Claude Code es la de server-monitor: tiempos corre con --sesiones apuntando a esa carpeta, y los mensajes de Monitor quedan sin asignar aquí."
+        }
+      ]
+    }
+  ]
+}

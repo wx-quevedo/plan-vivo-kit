@@ -104,6 +104,7 @@ describe('pnpm migrar y pnpm validar', { timeout: 60_000 }, () => {
     const r = correr(raiz, 'migrar', ['--plan', plan, '--aplicar'])
     expect(r.codigo).toBe(0)
     expect(r.salida).toContain(`Copia del original: ${plan}.bak`)
+    expect(existsSync(`${plan}.bak`)).toBe(true)
     expect(readFileSync(`${plan}.bak`, 'utf8')).toBe(texto)
     const migrado = readFileSync(plan, 'utf8')
     expect(JSON.parse(migrado)).toEqual(migrar(sinVersion()).plan)
@@ -122,6 +123,13 @@ describe('pnpm migrar y pnpm validar', { timeout: 60_000 }, () => {
     expect(correr(raiz, 'migrar', ['--plan', plan, '--aplicar']).codigo).toBe(0)
     expect(readFileSync(`${plan}.bak`, 'utf8')).toBe('copia anterior')
     expect(readdirSync(raiz).filter((n) => /^plan\.json\.\d{4}-.+\.bak$/.test(n))).toHaveLength(1)
+  })
+
+  it('con un plan que no existe: mensaje claro y código 1', () => {
+    const { raiz } = proyecto()
+    const r = correr(raiz, 'migrar', ['--plan', 'falta.json'])
+    expect(r.salida).toContain(`No existe el plan: ${join(raiz, 'falta.json')} (indicada con --plan)`)
+    expect(r.codigo).toBe(1)
   })
 
   it('un plan migrado que no cumple el esquema no se escribe', () => {

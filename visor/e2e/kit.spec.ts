@@ -112,6 +112,8 @@ test('plan que no existe: el visor no arranca y dice qué ruta falta', () => {
         shell: true,
         encoding: 'utf8',
         stdio: 'pipe',
+        // Si el visor arrancara a pesar del plan inexistente, no quedaría esperando para siempre.
+        timeout: 30_000,
       })
     } catch (error) {
       const e = error as { stdout: string; stderr: string; status: number }

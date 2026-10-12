@@ -84,6 +84,7 @@ describe('prioridad de rutas: argumento, luego archivo, luego defecto', () => {
   it('el archivo rechaza una lista de sesiones vacía o con algo que no sea texto', () => {
     expect(() => leerConfiguracion([], {}, { raiz: kit({ sesiones: [] }) })).toThrow(/sesiones tiene un tipo no válido/)
     expect(() => leerConfiguracion([], {}, { raiz: kit({ sesiones: ['a', 3] }) })).toThrow(/sesiones tiene un tipo no válido/)
+    expect(() => leerConfiguracion([], {}, { raiz: kit({ sesiones: ['a', ''] }) })).toThrow(/sesiones tiene un tipo no válido/)
   })
 })
 
@@ -97,6 +98,8 @@ describe('rutas que no existen', () => {
     const raiz = kit({ plan: 'falta.json' })
     const deArchivo = leerConfiguracion([], {}, { raiz })
     expect(() => exigirRuta(deArchivo, 'plan', deArchivo.plan)).toThrow(`(indicada en ${join(raiz, 'plan-vivo.config.json')})`)
+    const deVariable = leerConfiguracion([], { INIT_CWD: proyecto, PLAN_VIVO_PLAN: 'falta.json' }, { raiz: kit() })
+    expect(() => exigirRuta(deVariable, 'plan', deVariable.plan)).toThrow('(indicada en una variable PLAN_VIVO_*)')
   })
 
   it('asignaciones.json es opcional solo cuando nadie indicó la ruta', () => {
@@ -121,6 +124,7 @@ describe('proyecto nuevo', () => {
   it('un repositorio git sin commits no tiene commits que asignar (git log fallaría)', () => {
     const repo = dir()
     execFileSync('git', ['init', '-q'], { cwd: repo })
+    expect(() => commitsDeGit(repo)).not.toThrow()
     expect(commitsDeGit(repo)).toEqual([])
   })
 })

@@ -91,6 +91,16 @@ describe('desde la carpeta de otro proyecto', { timeout: 60_000 }, () => {
     expect(r.codigo).toBe(0)
   })
 
+  it('tiempos con un plan o un repositorio que no existen: mensaje claro y código 1', () => {
+    const raiz = proyecto()
+    const r = correr(raiz, 'tiempos', ['--plan', 'falta.json'])
+    expect(r.salida).toContain(`No existe el plan: ${join(raiz, 'falta.json')} (indicada con --plan)`)
+    expect(r.codigo).toBe(1)
+    const r2 = correr(raiz, 'tiempos', ['--plan', 'plan.json', '--repo', 'no-hay-repo'])
+    expect(r2.salida).toContain(`No existe la carpeta del repositorio: ${join(raiz, 'no-hay-repo')} (indicada con --repo)`)
+    expect(r2.codigo).toBe(1)
+  })
+
   it('tiempos con una carpeta de sesiones o unas asignaciones que no existen: mensaje claro y código 1', () => {
     const raiz = proyecto()
     const falta = join(raiz, 'no-hay-sesiones')

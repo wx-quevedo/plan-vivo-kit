@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { homedir } from 'node:os'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 import { SIN_ASIGNACIONES, type Asignaciones, type Commit } from './tramos'
 
 // Raíz del repositorio git que contiene una carpeta.
@@ -43,7 +43,27 @@ export function archivosDeSesion(carpeta: string): { sesiones: string[]; subagen
   return { sesiones, subagentes }
 }
 
+// Varias carpetas de sesiones (por ejemplo, las de un proyecto que cambió de carpeta): se juntan sus archivos.
+// Una carpeta repetida, o dos rutas a la misma, se leen una sola vez.
+export function archivosDeSesiones(carpetas: string[]): { sesiones: string[]; subagentes: string[] } {
+  const vistas = new Set<string>()
+  const unicas = carpetas.filter((carpeta) => {
+    const clave = resolve(carpeta).toLowerCase()
+    if (vistas.has(clave)) return false
+    vistas.add(clave)
+    return true
+  })
+  const partes = unicas.map(archivosDeSesion)
+  return { sesiones: partes.flatMap((p) => p.sesiones), subagentes: partes.flatMap((p) => p.subagentes) }
+}
+
 export function commitsDeGit(repo: string): Commit[] {
+  // Un repositorio recién creado todavía no tiene commits, y git log falla en él.
+  try {
+    execFileSync('git', ['rev-parse', '--verify', '--quiet', 'HEAD'], { cwd: repo, stdio: 'ignore' })
+  } catch {
+    return []
+  }
   const salida = execFileSync('git', ['log', '--format=%h|%aI'], { cwd: repo, encoding: 'utf8' })
   return salida
     .split('\n')

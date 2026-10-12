@@ -1,5 +1,5 @@
 // Pruebas de punta a punta del visor. Puertos propios para no chocar con un visor abierto en 5190:
-// 5191 para el visor con una copia del ejemplo y 5192 para el kit copiado a una carpeta vacía (kit.spec.ts).
+// 5191 para el visor con una copia del ejemplo y 5192 para el visor abierto desde otro proyecto (kit.spec.ts).
 import { defineConfig } from '@playwright/test'
 import { PLAN_E2E, PUERTO_E2E, URL_E2E } from './e2e/config'
 

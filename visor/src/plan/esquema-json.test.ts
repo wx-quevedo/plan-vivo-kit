@@ -52,6 +52,8 @@ describe('JSON Schema del plan', () => {
     ['fecha sin zona', (p) => (p.updated_at = '2026-10-09T15:00:00')],
     ['fecha que no es fecha', (p) => (p.phases[0].items[0].work_log[0].start = 'ayer')],
     ['versión de formato distinta de 1', (p) => (p.schema = 2)],
+    ['schema_version distinto de 1', (p) => (p.schema_version = 2)],
+    ['schema_version como texto', (p) => (p.schema_version = '1')],
     ['plan sin fases', (p) => (p.phases = [])],
     ['falta el título del item', (p) => delete p.phases[0].items[0].title],
     ['estimado con un solo número', (p) => (p.phases[0].items[0].estimate_min = [30])],
@@ -75,6 +77,10 @@ describe('JSON Schema del plan', () => {
     ['fecha en UTC con Z', (p) => (p.updated_at = '2026-10-09T20:00:00Z')],
     ['fase sin items con estimado propio', (p) => p.phases.push({ id: 'F4', name: 'Más adelante', estimate_min: [60, 120], items: [] })],
     ['sin $schema ni listas informativas', (p) => ['$schema', 'status_values', 'item_types'].forEach((k) => delete p[k])],
+    ['plan sin migrar: con schema y sin schema_version', (p) => {
+      delete p.schema_version
+      p.schema = 1
+    }],
   ]
   for (const [nombre, cambiar] of validos) {
     it(`acepta en ambos esquemas: ${nombre}`, () => {

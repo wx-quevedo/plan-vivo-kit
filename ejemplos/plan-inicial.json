@@ -1,6 +1,6 @@
 {
-  "$schema": "plan-vivo/schema/plan.schema.json",
-  "schema": 1,
+  "$schema": "../plan-vivo/schema/plan.schema.json",
+  "schema_version": 1,
   "project": "mi-proyecto",
   "title": "Mi proyecto",
   "updated_at": "2026-10-12T09:00:00-05:00",

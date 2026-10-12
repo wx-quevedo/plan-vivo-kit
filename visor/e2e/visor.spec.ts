@@ -92,7 +92,7 @@ test('recarga en vivo: al guardar plan.json el visor se actualiza sin recargar l
   await expect(tarjeta(page, 'F3')).toContainText('En curso · 0 de 2')
 
   // Un archivo a medio guardar (JSON roto) muestra el error y no deja la página en blanco.
-  writeFileSync(PLAN_E2E, '{ "schema": 1, ')
+  writeFileSync(PLAN_E2E, '{ "schema_version": 1, ')
   await expect(page.getByTestId('error-carga')).toContainText('plan.json no es JSON válido')
 
   // Un plan que no cumple el esquema lista los problemas con su ubicación.

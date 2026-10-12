@@ -1,6 +1,6 @@
 {
   "$schema": "../schema/plan.schema.json",
-  "schema": 1,
+  "schema_version": 1,
   "project": "agenda-citas",
   "title": "Agenda de citas",
   "updated_at": "2026-10-09T15:00:00-05:00",

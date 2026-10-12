@@ -1,9 +1,9 @@
 // Configuración compartida del visor y del script de tiempos.
 // Prioridad: argumentos de la línea de comandos > variables de entorno PLAN_VIVO_* > plan-vivo.config.json > valores por defecto.
 // Las rutas de los argumentos y de las variables se resuelven desde la carpeta donde se ejecutó el comando
-// (INIT_CWD, que pnpm conserva); las del archivo, desde la carpeta del archivo.
+// (INIT_CWD, que pnpm conserva también con pnpm --dir <kit>); las del archivo, desde la carpeta del archivo.
 import { existsSync, readFileSync } from 'node:fs'
-import { dirname, isAbsolute, join, resolve } from 'node:path'
+import { delimiter, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 export const RAIZ_KIT = dirname(fileURLToPath(import.meta.url))
@@ -20,20 +20,26 @@ export interface Configuracion {
   zonaHoraria: string
   // Repositorio git del proyecto; null: se busca desde la carpeta de plan.json.
   repo: string | null
-  // Carpeta de sesiones de Claude Code; null: se deduce del repositorio.
-  sesiones: string | null
+  // Carpetas de sesiones de Claude Code (una o varias); null: se deduce del repositorio.
+  sesiones: string[] | null
   // Ruta absoluta de asignaciones.json; el archivo puede no existir.
   asignaciones: string
   identificador: string
   // Archivo de configuración leído, o null si no hubo.
   archivo: string | null
+  // De dónde salió cada valor, para los mensajes de error.
+  origen: Record<Clave, Origen>
 }
 
+export type Origen = 'argumento' | 'variable' | 'archivo' | 'defecto'
+
 const CLAVES = ['plan', 'puerto', 'zonaHoraria', 'repo', 'sesiones', 'asignaciones', 'identificador'] as const
-type Clave = (typeof CLAVES)[number]
-type Parcial = Partial<Record<Clave, string | number | null>>
+export type Clave = (typeof CLAVES)[number]
+type Valor = string | number | string[] | null
+type Parcial = Partial<Record<Clave, Valor>>
 
 // Argumentos: --plan, --puerto, --zona, --repo, --sesiones, --asignaciones, --identificador, --config.
+// --sesiones se puede repetir; los demás, una sola vez.
 const ARGUMENTOS: Record<string, Clave | 'config'> = {
   '--plan': 'plan',
   '--puerto': 'puerto',
@@ -44,6 +50,9 @@ const ARGUMENTOS: Record<string, Clave | 'config'> = {
   '--identificador': 'identificador',
   '--config': 'config',
 }
+
+// Nombre del argumento de cada clave, para los mensajes.
+const ARGUMENTO_DE = Object.fromEntries(Object.entries(ARGUMENTOS).map(([nombre, clave]) => [clave, nombre])) as Record<Clave, string>
 
 const VARIABLES: Record<string, Clave | 'config'> = {
   PLAN_VIVO_PLAN: 'plan',
@@ -63,11 +72,13 @@ export class ErrorDeConfiguracion extends Error {
   }
 }
 
-function leerArgumentos(args: string[]): { valores: Parcial; config?: string; resto: string[] } {
+export function leerArgumentos(args: string[]): { valores: Parcial; config?: string; resto: string[] } {
   const valores: Parcial = {}
   let config: string | undefined
   const resto: string[] = []
   for (let i = 0; i < args.length; i++) {
+    // pnpm <comando> -- <argumentos> deja pasar el "--" tal cual: se ignora.
+    if (args[i] === '--') continue
     const [nombre, enLinea] = args[i].split(/=(.*)/s, 2)
     const clave = ARGUMENTOS[nombre]
     if (!clave) {
@@ -75,8 +86,10 @@ function leerArgumentos(args: string[]): { valores: Parcial; config?: string; re
       continue
     }
     const valor = enLinea ?? args[++i]
-    if (valor === undefined || valor.startsWith('--')) throw new ErrorDeConfiguracion(`Falta el valor de ${nombre}`)
-    if (clave === 'config') config = valor
+    if (valor === undefined || valor === '' || valor.startsWith('--')) throw new ErrorDeConfiguracion(`Falta el valor de ${nombre}`)
+    if (clave === 'sesiones') valores.sesiones = [...((valores.sesiones as string[] | undefined) ?? []), valor]
+    else if ((clave === 'config' ? config : valores[clave]) !== undefined) throw new ErrorDeConfiguracion(`${nombre} se indicó más de una vez`)
+    else if (clave === 'config') config = valor
     else valores[clave] = valor
   }
   return { valores, config, resto }
@@ -95,13 +108,19 @@ function leerArchivo(ruta: string): Parcial {
   if (desconocidas.length) throw new ErrorDeConfiguracion(`${ruta}: claves no reconocidas: ${desconocidas.join(', ')}. Válidas: ${CLAVES.join(', ')}`)
   for (const [clave, valor] of Object.entries(objeto)) {
     if (clave === '$comentario') continue
-    const tipoValido = clave === 'puerto' ? typeof valor === 'number' : typeof valor === 'string' || (valor === null && (clave === 'repo' || clave === 'sesiones'))
+    // sesiones admite una carpeta o una lista de carpetas.
+    const lista = clave === 'sesiones' && Array.isArray(valor) && valor.length > 0 && valor.every((v) => typeof v === 'string' && v !== '')
+    const tipoValido =
+      clave === 'puerto' ? typeof valor === 'number' : lista || typeof valor === 'string' || (valor === null && (clave === 'repo' || clave === 'sesiones'))
     if (!tipoValido) throw new ErrorDeConfiguracion(`${ruta}: ${clave} tiene un tipo no válido`)
   }
   return objeto as Parcial
 }
 
-const absoluta = (ruta: string, base: string) => (isAbsolute(ruta) ? ruta : resolve(base, ruta))
+// resolve también normaliza: en Windows, pnpm 11 pasa los argumentos con las barras invertidas duplicadas
+// (C:\a\plan.json llega como C:\\a\\plan.json), y resolve las deja simples.
+const absoluta = (ruta: string, base: string) => resolve(base, ruta)
+const vacio = (valor: Valor | undefined): valor is null | undefined | '' => valor === undefined || valor === null || valor === ''
 
 export function leerConfiguracion(
   args: string[] = [],
@@ -116,6 +135,8 @@ export function leerConfiguracion(
     const valor = entorno[variable]
     if (valor === undefined || valor === '') continue
     if (clave === 'config') configEntorno = valor
+    // PLAN_VIVO_SESIONES admite varias carpetas separadas por el separador de rutas del sistema (; en Windows).
+    else if (clave === 'sesiones') deEntorno.sesiones = valor.split(delimiter).filter(Boolean)
     else deEntorno[clave] = valor
   }
 
@@ -131,16 +152,22 @@ export function leerConfiguracion(
   const baseArchivo = archivo ? dirname(archivo) : raiz
 
   // Cada valor recuerda de dónde vino, para resolver sus rutas relativas desde la carpeta correcta.
-  const elegir = (clave: Clave): { valor: string | number | null | undefined; base: string } => {
-    if (argumentos.valores[clave] !== undefined) return { valor: argumentos.valores[clave], base }
-    if (deEntorno[clave] !== undefined) return { valor: deEntorno[clave], base }
-    return { valor: delArchivo[clave], base: baseArchivo }
+  const elegir = (clave: Clave): { valor: Valor | undefined; base: string; origen: Origen } => {
+    if (argumentos.valores[clave] !== undefined) return { valor: argumentos.valores[clave], base, origen: 'argumento' }
+    if (deEntorno[clave] !== undefined) return { valor: deEntorno[clave], base, origen: 'variable' }
+    const valor = delArchivo[clave]
+    return { valor, base: baseArchivo, origen: vacio(valor) ? 'defecto' : 'archivo' }
   }
+  const origen = Object.fromEntries(CLAVES.map((clave) => [clave, elegir(clave).origen])) as Record<Clave, Origen>
   const ruta = (clave: Clave, porDefecto: string | null): string | null => {
     const { valor, base: desde } = elegir(clave)
-    if (valor === undefined || valor === null || valor === '') return porDefecto
+    if (vacio(valor)) return porDefecto
     return absoluta(String(valor), desde)
   }
+  const { valor: valorSesiones, base: baseSesiones } = elegir('sesiones')
+  const sesiones = vacio(valorSesiones)
+    ? null
+    : (Array.isArray(valorSesiones) ? valorSesiones : [String(valorSesiones)]).map((carpeta) => absoluta(carpeta, baseSesiones))
 
   const plan = ruta('plan', join(raiz, 'plan.json'))!
   const puertoCrudo = elegir('puerto').valor ?? PUERTO_POR_DEFECTO
@@ -164,11 +191,40 @@ export function leerConfiguracion(
     puerto,
     zonaHoraria,
     repo: ruta('repo', null),
-    sesiones: ruta('sesiones', null),
+    sesiones,
     // Por defecto, junto a plan.json.
     asignaciones: ruta('asignaciones', join(dirname(plan), 'asignaciones.json'))!,
     identificador,
     archivo,
+    origen,
     resto: argumentos.resto,
   }
+}
+
+const DESCRIPCION = {
+  plan: 'el plan',
+  repo: 'la carpeta del repositorio',
+  sesiones: 'la carpeta de sesiones',
+  asignaciones: 'el archivo de asignaciones',
+} as const
+
+// Falla con un mensaje claro si una ruta no existe: dice de dónde salió y cómo cambiarla.
+// Con opcionalPorDefecto, la ausencia no es un error cuando nadie indicó la ruta (asignaciones.json es opcional).
+export function exigirRuta(
+  config: Pick<Configuracion, 'origen' | 'archivo'>,
+  clave: keyof typeof DESCRIPCION,
+  ruta: string,
+  { opcionalPorDefecto = false }: { opcionalPorDefecto?: boolean } = {},
+): void {
+  const origen = config.origen[clave]
+  if (existsSync(ruta) || (opcionalPorDefecto && origen === 'defecto')) return
+  const desde = {
+    argumento: `indicada con ${ARGUMENTO_DE[clave]}`,
+    variable: 'indicada en una variable PLAN_VIVO_*',
+    archivo: `indicada en ${config.archivo}`,
+    defecto: 'valor por defecto',
+  }[origen]
+  throw new ErrorDeConfiguracion(
+    `No existe ${DESCRIPCION[clave]}: ${ruta} (${desde}). Indica la ruta con ${ARGUMENTO_DE[clave]} <ruta absoluta> o en plan-vivo.config.json.`,
+  )
 }

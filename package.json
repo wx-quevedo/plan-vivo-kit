@@ -8,6 +8,7 @@
     "visor": "tsx visor/bin/visor.ts",
     "validar": "tsx visor/bin/validar.ts",
     "tiempos": "tsx tiempos/src/main.ts",
+    "migrar": "tsx visor/bin/migrar.ts",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "e2e": "pnpm --filter visor e2e",

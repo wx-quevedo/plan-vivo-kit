@@ -4,3 +4,4 @@ test-results/
 playwright-report/
 visor/e2e/.tmp/
 *.log
+*.bak

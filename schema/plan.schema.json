@@ -5,14 +5,18 @@
   "description": "Plan de un proyecto dividido en fases e items, con el registro de trabajo real de cada item. Es el mismo formato que valida el visor (visor/src/plan/schema.ts). Tres reglas no se pueden expresar en JSON Schema y solo las valida el visor: el fin de cada tramo debe ser posterior a su inicio, el mínimo de un rango no puede superar al máximo, y los ids de los items no se repiten en todo el plan.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "project", "title", "updated_at", "phases"],
+  "required": ["project", "title", "updated_at", "phases"],
   "properties": {
     "$schema": {
       "description": "Opcional: ruta a este JSON Schema, para que el editor valide y complete el archivo.",
       "type": "string"
     },
+    "schema_version": {
+      "description": "Versión del formato de plan.json. La actual es 1. Si falta, pnpm validar avisa y pnpm migrar lo agrega.",
+      "const": 1
+    },
     "schema": {
-      "description": "Versión del formato. Siempre 1.",
+      "description": "Obsoleto: versión del formato antes de schema_version. pnpm migrar lo reemplaza por schema_version.",
       "const": 1
     },
     "project": {

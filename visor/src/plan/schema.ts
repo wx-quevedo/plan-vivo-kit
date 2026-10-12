@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+// Versión actual del formato de plan.json. Si cambia, se agrega su migración en migraciones.ts.
+export const VERSION_ESQUEMA = 1
+
 export const STATUSES = ['pending', 'in_progress', 'needs_you', 'done', 'problem'] as const
 export const ITEM_TYPES = ['prompt', 'gate', 'unplanned'] as const
 
@@ -61,7 +64,11 @@ export const planSchema = z
   .object({
     // Ruta al JSON Schema (schema/plan.schema.json), para que el editor valide y complete el archivo.
     $schema: z.string().optional(),
-    schema: z.literal(1),
+    // Versión del formato (ver migraciones.ts). Opcional para que un plan sin migrar se siga viendo;
+    // pnpm validar avisa si falta.
+    schema_version: z.literal(VERSION_ESQUEMA).optional(),
+    // Campo de la versión anterior a schema_version: la migración a la versión 1 lo quita.
+    schema: z.literal(1).optional(),
     project: z.string().min(1),
     title: z.string().min(1),
     updated_at: isoDate,

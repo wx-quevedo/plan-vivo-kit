@@ -3,7 +3,7 @@
   "schema": 1,
   "project": "plan-vivo",
   "title": "Plan vivo (kit)",
-  "updated_at": "2026-10-12T09:50:00-05:00",
+  "updated_at": "2026-10-12T09:43:00-05:00",
   "phases": [
     {
       "id": "F0",
@@ -16,7 +16,22 @@
           "status": "done",
           "estimate_min": null,
           "difficulty": 6,
-          "work_log": [],
+          "work_log": [
+            {
+              "actor": "coding_agent",
+              "start": "2026-10-12T08:35:24-05:00",
+              "end": "2026-10-12T09:01:33-05:00",
+              "note": "",
+              "commits": ["f398153"]
+            },
+            {
+              "actor": "coding_agent",
+              "start": "2026-10-12T09:40:37-05:00",
+              "end": "2026-10-12T09:42:05-05:00",
+              "note": "",
+              "commits": ["b9aef66"]
+            }
+          ],
           "summary": "Repositorio nuevo con el visor independiente, el script de tiempos generalizado, el esquema, el ejemplo, las guías y el zip.",
           "steps": [
             "Visor copiado de Monitor como app React + Vite: plan.json por ruta configurable, recarga al guardar, ES/EN",

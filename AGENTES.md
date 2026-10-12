@@ -1,18 +1,21 @@
 # Plan vivo: instrucciones para agentes de código
 
-Este archivo es para ti, agente. El proyecto lleva su plan en `plan.json` (en la raíz, salvo que la configuración diga otra cosa), y tu trabajo es mantenerlo al día. La persona lo mira en el visor, que se recarga solo al guardar.
+Este archivo es para ti, agente. El proyecto lleva su plan en `plan.json`, en su raíz, y tu trabajo es mantenerlo al día. La persona lo mira en el visor, que se recarga solo al guardar.
 
-- **Formato exacto:** `plan-vivo/schema/plan.schema.json`.
-- **Ejemplo completo:** `plan-vivo/ejemplos/plan.json`.
+El kit vive en una sola carpeta, `C:\xampp\htdocs\plan-vivo` (en adelante, «el kit»), y no se copia al proyecto: en el proyecto solo están `plan.json` y, si hace falta, `asignaciones.json`. Todos los comandos se corren desde el kit apuntando al plan del proyecto con `--plan` (sección 8).
+
+- **Formato exacto:** `C:\xampp\htdocs\plan-vivo\schema\plan.schema.json`.
+- **Ejemplo completo:** `C:\xampp\htdocs\plan-vivo\ejemplos\plan.json`.
+- **Fallos o mejoras del kit:** no los arregles en el proyecto ni copies el kit; anótalos en `C:\xampp\htdocs\plan-vivo\PENDIENTES.md` (sección 9).
 
 ## 1. Crear plan.json al empezar un proyecto
 
-Créalo en cuanto haya un plan acordado con la persona, antes del primer prompt de trabajo. Parte de `plan-vivo/ejemplos/plan-inicial.json`:
+Créalo en la raíz del proyecto en cuanto haya un plan acordado con la persona, antes del primer prompt de trabajo. Parte de `ejemplos/plan-inicial.json` del kit:
 
 ```json
 {
-  "$schema": "plan-vivo/schema/plan.schema.json",
-  "schema": 1,
+  "$schema": "../plan-vivo/schema/plan.schema.json",
+  "schema_version": 1,
   "project": "mi-proyecto",
   "title": "Mi proyecto",
   "updated_at": "2026-10-12T09:00:00-05:00",
@@ -43,6 +46,8 @@ Créalo en cuanto haya un plan acordado con la persona, antes del primer prompt 
 
 Reglas:
 
+- **schema_version:** versión del formato; la actual es 1. Va siempre. Si un plan no lo tiene, o es de una versión anterior, migra con `pnpm migrar` (sección 8).
+- **$schema:** ruta al esquema del kit relativa a `plan.json`, para que el editor valide y complete. Con el proyecto en `C:\xampp\htdocs\<proyecto>`, es `../plan-vivo/schema/plan.schema.json`.
 - **Ids de fase:** `F1`, `F2`, … en orden.
 - **Ids de item:** únicos en todo el plan.
   - `P` + número para los prompts;
@@ -55,7 +60,7 @@ Reglas:
 - **difficulty:** de 1 a 10, opcional.
 - **Fechas:** ISO 8601 con la zona del proyecto, por ejemplo `2026-10-12T09:00:00-05:00`.
 - **Sin status en las fases.** El visor lo deriva de sus items (sección 4), y el esquema rechaza un `status` en una fase.
-- Valida con `pnpm validar`, desde la carpeta `plan-vivo/`.
+- Valida con `pnpm validar` (sección 8).
 
 ## 2. Agregar fases e items
 
@@ -83,12 +88,12 @@ Al terminar cada prompt, antes del commit final, sigue estos pasos.
    Actualiza también `updated_at` en la raíz.
 2. **Registra lo que no estaba en el plan:** si apareció algo no planeado, agrégalo como item `unplanned` (sección 2).
 3. **Revisa y aplica los tramos de trabajo:**
-   - corre `pnpm tiempos` desde `plan-vivo/`;
+   - corre `pnpm tiempos` con `--plan` (sección 8);
    - revisa la tabla de diferencias, los mensajes sin asignar y los commits fuera de tramo;
-   - si todo está bien, aplica con `pnpm tiempos --aplicar`.
+   - si todo está bien, aplica con el mismo comando y `--aplicar`.
 
    No escribas el `work_log` a mano (sección 6).
-4. **Valida** con `pnpm validar`. Si la persona tiene el visor abierto, revisa que se vea bien.
+4. **Valida** con `pnpm validar --plan <ruta>`. Si la persona tiene el visor abierto, revisa que se vea bien.
 5. **Haz el commit** de `plan.json` junto con lo demás del cierre.
 
 Estados de un item:
@@ -107,7 +112,7 @@ Una puerta pasa a `done` solo cuando la persona la aprueba. Mientras tanto queda
 
 | Campo | Quién lo escribe |
 |---|---|
-| `schema`, `project`, `title`, `updated_at` | Tú, a mano. |
+| `schema_version`, `$schema`, `project`, `title`, `updated_at` | Tú, a mano (`schema_version` también lo cambia `pnpm migrar`). |
 | Fase: `id`, `name`, `estimate_min`, `items` | Tú, a mano. |
 | Item: `id`, `type`, `title`, `status`, `estimate_min`, `difficulty`, `summary`, `steps`, `files_changed`, `notes` | Tú, a mano. |
 | Item: `work_log` (tramos con `actor`, `start`, `end`, `note`, `commits`) | El script de tiempos (`pnpm tiempos --aplicar`). |
@@ -144,21 +149,21 @@ Construye el `work_log` de cada item a partir de dos fuentes:
 Privacidad: de cada registro usa solo la marca de tiempo, el tipo de evento y la primera línea de los mensajes de la persona. Nada más se copia ni se imprime.
 
 ```
-pnpm tiempos                   muestra la tabla de diferencias; no escribe nada
-pnpm tiempos --aplicar         escribe el work_log en plan.json, después de validar con el esquema
+pnpm tiempos --plan <ruta>             muestra la tabla de diferencias; no escribe nada
+pnpm tiempos --plan <ruta> --aplicar   escribe el work_log en plan.json, después de validar con el esquema
 ```
 
-Opciones (también en `plan-vivo.config.json`):
+Opciones (también en `plan-vivo.config.json`, ver README):
 
 - `--plan <ruta>`;
-- `--repo <carpeta>`;
-- `--sesiones <carpeta>`;
-- `--asignaciones <ruta>`;
+- `--repo <carpeta>`: por defecto, la raíz git de la carpeta del plan;
+- `--sesiones <carpeta>`: se puede repetir, por ejemplo si el proyecto cambió de carpeta y sus sesiones quedaron en dos lugares;
+- `--asignaciones <ruta>`: por defecto, `asignaciones.json` junto al plan;
 - `--zona <IANA>`;
 - `--identificador <regex>`;
 - `--config <ruta>`.
 
-Si no se indica la carpeta de sesiones, se busca en `~/.claude/projects/` la que corresponde al repositorio: la ruta con cada carácter que no sea letra o número cambiado por un guion. Por ejemplo, `C:\proyectos\mi-app` queda como `c--proyectos-mi-app`.
+Si no se indica la carpeta de sesiones, se busca en `~/.claude/projects/` la que corresponde al repositorio: la ruta con cada carácter que no sea letra o número cambiado por un guion. Por ejemplo, `C:\proyectos\mi-app` queda como `c--proyectos-mi-app`. Con varias carpetas, las sesiones de todas se leen juntas, en orden de tiempo.
 
 **Cómo asigna cada mensaje de la persona a un item:**
 
@@ -214,3 +219,34 @@ Nunca corrijas el `work_log` a mano: si la regla no resuelve un caso, agrega la 
   - lo que falta = estimado medio × factor, menos lo ya trabajado en los items en curso.
   - Sin items terminados, el factor es 1.
 - **Fechas:** ISO 8601 con la zona configurada (`zonaHoraria`). El script escribe con precisión de segundos.
+
+## 8. Comandos desde el proyecto
+
+Todos se corren desde el kit. Desde la carpeta del proyecto, sin moverte:
+
+```
+pnpm --dir C:\xampp\htdocs\plan-vivo validar -- --plan C:\xampp\htdocs\<proyecto>\plan.json
+pnpm --dir C:\xampp\htdocs\plan-vivo tiempos -- --plan C:\xampp\htdocs\<proyecto>\plan.json
+pnpm --dir C:\xampp\htdocs\plan-vivo tiempos -- --plan C:\xampp\htdocs\<proyecto>\plan.json --aplicar
+pnpm --dir C:\xampp\htdocs\plan-vivo migrar -- --plan C:\xampp\htdocs\<proyecto>\plan.json
+pnpm --dir C:\xampp\htdocs\plan-vivo visor -- --plan C:\xampp\htdocs\<proyecto>\plan.json
+```
+
+- Usa rutas absolutas. Con `pnpm --dir`, una relativa se resuelve desde la carpeta donde llamaste (el proyecto), así que `--plan plan.json` también funciona.
+- Si una ruta no existe, el comando termina con un mensaje que dice cuál falta y de dónde salió. No sigas: corrige la ruta.
+- **validar** sale con código 1 si el plan no cumple el esquema, y avisa (sin fallar) si falta `schema_version`.
+- **migrar** sin `--aplicar` solo muestra los cambios. Revísalos y aplica con `--aplicar`: escribe el plan, después de validar, y deja `plan.json.bak` con el original. Haz el commit del plan migrado; el `.bak` no se versiona. Migrar dos veces no cambia nada.
+- **visor:** puerto 5190 por defecto. Si la persona ya lo tiene abierto, no lo detengas ni levantes otro en ese puerto; si necesitas uno propio, usa `--puerto 5192`.
+
+No copies el kit al proyecto ni crees un `plan-vivo.config.json` en el proyecto: el plan se indica siempre con `--plan`.
+
+## 9. Fallos y mejoras del kit (PENDIENTES.md)
+
+Si encuentras un fallo del kit (el visor, tiempos, validar, migrar, el esquema o estas instrucciones) o una mejora que valdría para todos los proyectos:
+
+- no lo arregles en el proyecto, no copies el kit para parcharlo y no edites otros archivos del kit;
+- agrega una entrada al final de la sección «Abiertos» de `C:\xampp\htdocs\plan-vivo\PENDIENTES.md`, con el formato fijo del archivo: fecha, proyecto de origen, qué pasa, cómo reproducirlo y prioridad;
+- dile a la persona, en una línea, que lo anotaste;
+- sigue con tu trabajo con un rodeo si lo hay, y anótalo en `notes` del item.
+
+El kit se corrige solo desde su propia sesión, en su carpeta.

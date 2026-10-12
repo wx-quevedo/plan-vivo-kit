@@ -18,7 +18,7 @@ Aprobadas por Washington el 2026-10-12.
 - **K1** Una sola instalación. El kit vive solo en `C:\xampp\htdocs\plan-vivo`. Cada proyecto guarda únicamente su `plan.json` (y, si hace falta, su `asignaciones.json`). Visor, tiempos, validar y migrar se corren desde el kit apuntando al plan del proyecto con `--plan`. Nunca se copia el kit a otro repositorio.
   - **Por qué:** con una copia por proyecto, cada arreglo había que repetirlo en todas las copias, y las copias se separaban (Monitor ya tenía un visor y un script de tiempos distintos de los del kit). Con una sola instalación, una mejora llega a todos los proyectos a la vez.
   - **Consecuencias:** los comandos aceptan `--plan`, `--sesiones` (repetible) y `--asignaciones`, y funcionan desde otra carpeta con `pnpm --dir C:\xampp\htdocs\plan-vivo <comando> -- <argumentos>`. Prioridad: argumento, luego variable de entorno, luego `plan-vivo.config.json`, luego valor por defecto.
-- **K2** La skill «plan vivo» será corta: cuándo usarla, dónde está el kit y los comandos. Para el detalle remite a `AGENTES.md`, que es la fuente de verdad.
+- **K2** La skill «plan vivo» será corta: cuándo usarla, dónde está el kit y los comandos. Para el detalle remite a `AGENTES.md`, que es la fuente de verdad. La escribe y la guarda Washington desde claude.ai; no va en este repositorio.
   - **Por qué:** si el detalle estuviera en la skill y en `AGENTES.md`, habría dos textos que mantener iguales. Con la skill corta, un cambio del kit solo toca `AGENTES.md`.
 - **K3** Cada `plan.json` lleva la versión del esquema (`schema_version`, entero; la actual es 1). Si una mejora cambia el formato, el kit trae una migración (`pnpm migrar`).
   - **Por qué:** con una sola instalación (K1), un cambio de formato afecta a los planes de todos los proyectos a la vez. La versión dice qué formato tiene cada plan, y la migración lo pone al día sin editarlo a mano.
@@ -28,8 +28,10 @@ Aprobadas por Washington el 2026-10-12.
   - **Cómo:** la regla está en `AGENTES.md` (sección 9) y en el bloque de `snippet-claude.md`, que va en el `CLAUDE.md` de cada proyecto.
 - **K5** Más adelante, el kit irá a un repositorio privado en GitHub para usarlo también en la Mac. No ahora.
   - **Por qué:** por ahora todo el trabajo es en esta PC, y el kit todavía cambia rápido. Mientras tanto no se hace push (ver `CLAUDE.md`).
-- **K6** `schema_version` reemplaza al campo `schema` que tenían los planes de F0 (`"schema": 1`). La migración a la versión 1 agrega `schema_version` después de `$schema` y quita `schema`. Decidida por esta sesión en F1 · P2, al aplicar K3.
+- **K6** `schema_version` reemplaza al campo `schema` que tenían los planes de F0 (`"schema": 1`). La migración a la versión 1 agrega `schema_version` después de `$schema` y quita `schema`. Propuesta por esta sesión en F1 · P2, al aplicar K3, y aprobada por Washington el 2026-10-12.
   - **Por qué:** el encargo pedía un campo `schema_version`, y dos campos con la misma versión podían contradecirse. El esquema sigue aceptando `schema` y la falta de `schema_version`, para que un plan sin migrar (por ejemplo el de Monitor) se siga viendo en el visor; `pnpm validar` avisa.
+- **K7** En `asignaciones.json`, `null` como valor de un mensaje lo excluye: no abre ningún item y cierra el que estaba abierto. Propuesta por esta sesión en F1 · P2 y aprobada por Washington el 2026-10-12.
+  - **Por qué:** con `--sesiones` repetido se puede leer la carpeta de sesiones de otro proyecto (las de F0 quedaron en la de Monitor). Sus mensajes traen identificadores propios que pueden existir también en este plan, como su «F1 · P2:», y sin forma de excluirlos el script les asignaba tramos falsos.
 
 ## 3. Bitácora
 
@@ -40,8 +42,12 @@ Aprobadas por Washington el 2026-10-12.
   - README.md, AGENTES.md, snippet-claude.md y capturas;
   - pruebas: 70 del visor, 30 de tiempos y 8 e2e, con 23 mutaciones verificadas en rojo;
   - plan propio del kit (`plan.json` y `asignaciones.json`, fuera del zip) con sus tramos cargados por `pnpm tiempos`. Las sesiones de ese trabajo quedaron en la carpeta de sesiones de Monitor.
-- 2026-10-12 — **Incidente: otro agente borró la carpeta del kit por error.** Lo informó Washington al encargar F1 · P2. El historial git está completo (f398153, b9aef66 y 5b486ce, el primero como commit inicial), el árbol de trabajo coincidía con el último commit y las pruebas estaban en verde al empezar P2, así que no hubo pérdida que se notara. Falta registrar qué agente fue, cuándo pasó y cómo se recuperó la carpeta (ver «Próximos pasos»). Lección: cada avance del kit se cierra con commit, y el zip `C:\xampp\htdocs\plan-vivo-kit.zip` sirve de respaldo fuera de la carpeta.
-- 2026-10-12 — **F1 · P2, uso desde otros proyectos.** Esta sesión toma el kit. Decisiones K1 a K6.
+- 2026-10-12 — **Incidente: otro agente borró la carpeta del kit por error** (datos de Washington).
+  - **Qué pasó:** el prompt del kit se pegó por error en la sesión del proyecto visualizador-agentes (`E:\visualizador-agentes`). Ese agente empezó a crear `C:\xampp\htdocs\plan-vivo` y, al detenerse, borró la carpeta completa y sus copias temporales, alrededor de las 08:37 del 12 de octubre.
+  - **Alcance:** no creó el zip ni tocó server-monitor. Su repositorio quedó limpio en 3591666.
+  - **Recuperación:** no hizo falta. El agente correcto, la sesión de server-monitor, construyó el kit después de ese borrado (commit inicial f398153) y verificó todo, así que no se perdió nada. Al empezar F1 · P2, el historial git estaba completo, el árbol coincidía con el último commit y las pruebas estaban en verde.
+  - **Lección:** antes de mandar un prompt, revisar en qué sesión se pega: el identificador («F0 · P1:») no impide que otro agente lo tome. Cada avance del kit se cierra con commit, y el zip `C:\xampp\htdocs\plan-vivo-kit.zip` sirve de respaldo fuera de la carpeta.
+- 2026-10-12 — **F1 · P2, uso desde otros proyectos.** Esta sesión toma el kit. Decisiones K1 a K7.
   - `CLAUDE.md`, este `PROJECT.md` y `PENDIENTES.md` (con su primera entrada: marcas del eje corridas una hora con horario de verano).
   - Rutas por línea de comandos: `--` ignorado (pnpm lo pasa tal cual), `--sesiones` repetible y como lista en el archivo, origen de cada valor y `exigirRuta` con mensaje claro (qué falta, de dónde salió, cómo indicarlo).
   - `schema_version` y `pnpm migrar`; migración 0 a 1 aplicada al plan del kit y a las dos plantillas de `ejemplos/`.
@@ -51,6 +57,8 @@ Aprobadas por Washington el 2026-10-12.
   - Pruebas: 55 de tiempos, 85 del visor y 9 e2e, todas en verde (antes: 30, 70 y 8). 38 mutaciones de las funciones nuevas en rojo por aserción y en verde al restaurar. Las 5 que sobrevivieron en la primera ronda (rutas inexistentes de tiempos y migrar, origen de variable, lista de sesiones con texto vacío) tienen ahora su prueba.
   - Verificación con Monitor, en solo lectura: visor con `--plan C:\xampp\htdocs\server-monitor\plan.json` desde otra carpeta (captura en `docs/verificacion/visor-monitor-desde-kit.png`, fuera del zip) y `pnpm tiempos` sin `--aplicar`, con sus asignaciones de `scripts/tiempos/`: tabla idéntica a la de antes de P2, 95 tramos «igual». El sha256 del plan de Monitor es el mismo antes y después (29713a88…8dad).
   - `npx autoskills --dry-run`: detectó TypeScript, Node.js, React, Zod, Playwright, Vite y Vitest, y propuso 12 skills. No se instaló nada.
+- 2026-10-12 — Washington aprobó K6 y K7 y completó los datos del incidente. Skills instaladas con `npx autoskills -a claude-code`: las 12 del dry-run (accessibility, seo, vite, vitest, frontend-design, playwright-best-practices, zod, nodejs-best-practices, react-best-practices, composition-patterns, typescript-advanced-types y nodejs-backend-patterns).
+  - Quedan en `.agents/skills/`, con enlaces en `.claude/skills/` y su `skills-lock.json`. Por indicación de Washington, ningún archivo de skill va al repositorio: las tres rutas están en `.gitignore` y no viajan en el zip.
 
 ## 4. Problemas y resoluciones
 
@@ -67,8 +75,8 @@ Aprobadas por Washington el 2026-10-12.
 
 ## 5. Próximos pasos
 
-- Washington: confirmar los detalles del incidente de la carpeta borrada (qué agente, cuándo, cómo se recuperó) para completar la bitácora.
-- Escribir la skill corta «plan vivo» (K2): cuándo usarla, dónde está el kit y los comandos con `--plan`; el detalle, en `AGENTES.md`.
+- Washington guarda la skill corta «plan vivo» (K2) desde claude.ai. Esta sesión no la escribe ni agrega archivos de skill al repositorio.
+- En otra PC, o si se borran, las skills de autoskills se reinstalan con `npx autoskills -a claude-code` en la raíz del kit.
 - server-monitor, al aplicar D37 en F3: borrar su copia del visor y de `scripts/tiempos`, pegar el bloque nuevo de `snippet-claude.md` en su `CLAUDE.md` y correr los comandos del kit con `--plan C:\xampp\htdocs\server-monitor\plan.json --asignaciones C:\xampp\htdocs\server-monitor\scripts\tiempos\asignaciones.json` (o mover sus asignaciones junto al plan). Su plan no tiene `schema_version`: migrarlo desde allá con `pnpm migrar`.
 - Resolver la entrada abierta de `PENDIENTES.md` (marcas del eje con horario de verano).
 - K5: repositorio privado en GitHub para la Mac, cuando Washington lo pida.

@@ -5,3 +5,7 @@ playwright-report/
 visor/e2e/.tmp/
 *.log
 *.bak
+# Skills instaladas con npx autoskills: son locales, no van al repositorio.
+.agents/
+.claude/skills/
+skills-lock.json

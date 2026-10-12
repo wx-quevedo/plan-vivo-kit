@@ -1,0 +1,120 @@
+// Lo que cambió al sacar el script de server-monitor: zona horaria, identificador, asignaciones opcionales y rutas.
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { describe, expect, it } from 'vitest'
+import { readSession } from '../src/jsonl'
+import { proponer, SIN_ASIGNACIONES } from '../src/tramos'
+import { aplicar } from '../src/plan'
+import { carpetaDeSesiones, leerAsignaciones, nombreDeCarpeta } from '../src/fuentes'
+import { diferencias } from '../src/diferencias'
+
+const Z = (hm: string) => `2026-10-11T${hm}:00.000Z`
+const humano = (hm: string, texto: string) => ({ type: 'user', timestamp: Z(hm), origin: { kind: 'human' }, message: { content: texto } })
+const agente = (hm: string) => ({ type: 'assistant', timestamp: Z(hm), message: { content: [{ type: 'text', text: 'relleno' }] } })
+const dir = () => mkdtempSync(join(tmpdir(), 'tiempos-'))
+
+function eventos(registros: object[]) {
+  const ruta = join(dir(), 'sesion.jsonl')
+  writeFileSync(ruta, registros.map((r) => JSON.stringify(r)).join('\n') + '\n')
+  return readSession(ruta)
+}
+
+const proponerCon = (registros: object[], items: string[], identificador?: RegExp) =>
+  proponer({ eventos: eventos(registros), subagentes: [], commits: [], asignaciones: SIN_ASIGNACIONES, items: new Set(items), identificador })
+
+describe('identificador de item', () => {
+  it('reconoce ids con letra final y prefijos de fase de varias letras: "F2 · P6b:" y "QA1 · T3:"', () => {
+    const p = proponerCon([humano('10:00', 'F2 · P6b: algo'), agente('10:10'), humano('11:00', 'QA1 · T3: otra'), agente('11:05')], ['P6b', 'T3'])
+    expect(p.sinAsignar).toEqual([])
+    expect([...p.porItem.keys()]).toEqual(['P6b', 'T3'])
+  })
+
+  it('un "Nota:" o una hora "10:30" al inicio no abren ningún item', () => {
+    const p = proponerCon([humano('10:00', 'F1 · P1: algo'), agente('10:10'), humano('10:20', 'Nota: a las 10:30 reviso'), agente('10:25')], ['P1'])
+    expect(p.sinAsignar).toEqual([])
+    expect(p.porItem.get('P1')).toHaveLength(2)
+  })
+
+  it('acepta una expresión propia (por ejemplo "[T-12]")', () => {
+    const p = proponerCon([humano('10:00', '[T-12] arreglar el login'), agente('10:10')], ['T-12'], /^\[(T-\d+)\]/)
+    expect(p.porItem.get('T-12')).toHaveLength(1)
+  })
+})
+
+describe('asignaciones.json opcional', () => {
+  it('sin archivo: ninguna excepción', () => {
+    expect(leerAsignaciones(join(dir(), 'no-existe.json'))).toEqual(SIN_ASIGNACIONES)
+  })
+
+  it('con solo uno de los campos: los otros quedan vacíos', () => {
+    const ruta = join(dir(), 'asignaciones.json')
+    writeFileSync(ruta, JSON.stringify({ esperas: { [Z('10:30')]: 'comando con sudo' } }))
+    expect(leerAsignaciones(ruta)).toEqual({ mensajes: {}, subagentes: {}, esperas: { [Z('10:30')]: 'comando con sudo' } })
+  })
+
+  it('con un campo de tipo incorrecto: falla y dice cuál', () => {
+    const ruta = join(dir(), 'asignaciones.json')
+    writeFileSync(ruta, JSON.stringify({ mensajes: { [Z('10:30')]: 7 } }))
+    expect(() => leerAsignaciones(ruta)).toThrow(/mensajes\.2026-10-11T10:30:00\.000Z debe ser un texto/)
+  })
+})
+
+describe('zona horaria al escribir plan.json', () => {
+  it('escribe los tramos en la hora local de la zona configurada, con su desfase', () => {
+    const ruta = join(dir(), 'plan.json')
+    const plan = {
+      schema: 1,
+      project: 'prueba',
+      title: 'Prueba',
+      updated_at: '2026-10-11T10:00:00+02:00',
+      phases: [{ id: 'A', name: 'Base', items: [{ id: 'P1', type: 'prompt', title: 'x', status: 'in_progress' }] }],
+    }
+    writeFileSync(ruta, JSON.stringify(plan))
+    const p = proponerCon([humano('10:00', 'A1 · P1: algo'), agente('10:30')], ['P1'])
+    aplicar(ruta, p.porItem, 'Europe/Madrid')
+    const tramo = JSON.parse(readFileSync(ruta, 'utf8')).phases[0].items[0].work_log[0]
+    expect([tramo.start, tramo.end]).toEqual(['2026-10-11T12:00:00+02:00', '2026-10-11T12:30:00+02:00'])
+  })
+})
+
+describe('tramos del orquestador cargados a mano', () => {
+  it('--aplicar los conserva y los ordena con los propuestos; la tabla los marca como manuales', () => {
+    const ruta = join(dir(), 'plan.json')
+    const orquestador = { actor: 'orchestrator', start: '2026-10-11T04:50:00-05:00', end: '2026-10-11T04:58:00-05:00', note: 'redacta el prompt', commits: [] }
+    const plan = {
+      schema: 1,
+      project: 'prueba',
+      title: 'Prueba',
+      updated_at: '2026-10-11T10:00:00-05:00',
+      phases: [{ id: 'F1', name: 'Base', items: [{ id: 'P1', type: 'prompt', title: 'x', status: 'in_progress', work_log: [orquestador] }] }],
+    }
+    writeFileSync(ruta, JSON.stringify(plan))
+    const p = proponerCon([humano('10:00', 'F1 · P1: algo'), agente('10:30')], ['P1'])
+    expect(diferencias(plan, p.porItem, 'America/Guayaquil').map((f) => [f.actor, f.estado])).toEqual([
+      ['coding_agent', 'solo propuesto'],
+      ['orchestrator', 'manual (se conserva)'],
+    ])
+    aplicar(ruta, p.porItem, 'America/Guayaquil')
+    const log = JSON.parse(readFileSync(ruta, 'utf8')).phases[0].items[0].work_log
+    expect(log.map((t: { actor: string; start: string }) => [t.actor, t.start])).toEqual([
+      ['orchestrator', '2026-10-11T04:50:00-05:00'],
+      ['coding_agent', '2026-10-11T05:00:00-05:00'],
+    ])
+  })
+})
+
+describe('carpeta de sesiones de Claude Code', () => {
+  it('cada carácter que no es letra o número se cambia por un guion', () => {
+    expect(nombreDeCarpeta('C:\\xampp\\htdocs\\server-monitor')).toBe('c--xampp-htdocs-server-monitor')
+    expect(nombreDeCarpeta('C:/xampp/htdocs/server-monitor')).toBe('c--xampp-htdocs-server-monitor')
+    expect(nombreDeCarpeta('/home/ana/mi_app.v2')).toBe('-home-ana-mi-app-v2')
+  })
+
+  it('la busca sin distinguir mayúsculas y, si no existe, pide --sesiones', () => {
+    const base = dir()
+    mkdirSync(join(base, 'C--Proyectos-app'))
+    expect(carpetaDeSesiones('c:/proyectos/app', base)).toBe(join(base, 'C--Proyectos-app'))
+    expect(() => carpetaDeSesiones('c:/otro', base)).toThrow(/usa --sesiones/)
+  })
+})

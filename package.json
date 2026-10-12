@@ -1,0 +1,22 @@
+{
+  "name": "plan-vivo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@11.13.0",
+  "scripts": {
+    "visor": "tsx visor/bin/visor.ts",
+    "validar": "tsx visor/bin/validar.ts",
+    "tiempos": "tsx tiempos/src/main.ts",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "e2e": "pnpm --filter visor e2e",
+    "capturas": "pnpm --filter visor capturas",
+    "zip": "git archive --format=zip --prefix=plan-vivo/ -o ../plan-vivo-kit.zip HEAD"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "app": {
+    "subtitle": "Living plan",
+    "updated": "Updated: {date}",
+    "language": "Language",
+    "langEs": "ES",
+    "langEn": "EN",
+    "timezone": "{zone} time",
+    "file": "File: {path}"
+  },
+  "status": {
+    "pending": "Pending",
+    "in_progress": "In progress",
+    "needs_you": "Needs you",
+    "done": "Done",
+    "problem": "Problem"
+  },
+  "type": {
+    "prompt": "Prompt",
+    "gate": "Gate",
+    "unplanned": "Unplanned"
+  },
+  "actor": {
+    "orchestrator": "Orchestrator",
+    "coding_agent": "Coding agent",
+    "subagent": "Subagent",
+    "human": "Human"
+  },
+  "legend": {
+    "title": "Legend",
+    "unplanned": "Unplanned",
+    "gate": "Approval gate"
+  },
+  "phases": {
+    "title": "Phases",
+    "back": "Phases",
+    "summary": "{status} · {done} of {total}",
+    "empty": "No items defined",
+    "noItems": "This phase has no items defined yet.",
+    "open": "Open phase {id} {name}",
+    "progress": "Progress {percent} %",
+    "estimate": "Estimate {range}",
+    "real": "Actual {duration}",
+    "selectHint": "Tap an item to see its details."
+  },
+  "console": {
+    "command": "plan show {id}",
+    "title": "title",
+    "type": "type",
+    "status": "status",
+    "estimate": "estimate",
+    "real": "actual",
+    "overBy": "{duration} over the maximum",
+    "withinEstimate": "within estimate",
+    "started": "started",
+    "ended": "ended",
+    "summary": "summary",
+    "steps": "steps",
+    "commits": "commits",
+    "files": "files changed",
+    "notes": "notes",
+    "none": "no data",
+    "close": "Close",
+    "worklog": "work log",
+    "pauses": "pauses",
+    "pauseCount": "{count} pauses, {duration} in total",
+    "pauseOne": "1 pause, {duration}"
+  },
+  "timeline": {
+    "title": "Timeline",
+    "estimate": "Estimate",
+    "projected": "Projected",
+    "unestimated": "not estimated",
+    "now": "now",
+    "betweenPrompts": "between prompts",
+    "projectEnd": "{remaining} left · approx. close {date}",
+    "unestimatedOne": "(excluding 1 unestimated phase)",
+    "unestimatedMany": "(excluding {count} unestimated phases)",
+    "projectEndUnknown": "Approximate close: not enough data",
+    "factor": "Calibration factor ×{factor}, from {count} finished items (actual time / mean estimate). Continuous work from now.",
+    "factorOne": "Calibration factor ×{factor}, from 1 finished item (actual time / mean estimate). Continuous work from now.",
+    "factorNone": "No finished items to calibrate: projecting with the mean estimate (factor ×1). Continuous work from now.",
+    "rowLabel": "View phase {id} {name}",
+    "scopePlan": "Whole plan",
+    "scopeReal": "Worked time only",
+    "scopeLabel": "Timeline range",
+    "waiting": "waiting"
+  },
+  "map": {
+    "title": "Map",
+    "here": "You are here",
+    "station": "Go to phase {id} {name}"
+  },
+  "error": {
+    "title": "plan.json does not match the schema",
+    "intro": "The viewer cannot draw the plan. Fix these points: the viewer reloads by itself when plan.json is saved.",
+    "countOne": "1 problem found",
+    "countOther": "{count} problems found",
+    "invalid_status": "Invalid status \"{received}\" at {path}{where}. Allowed values: {allowed}.",
+    "invalid_item_type": "Invalid item type \"{received}\" at {path}{where}. Allowed values: {allowed}.",
+    "invalid_value": "Invalid value \"{received}\" at {path}{where}. Allowed values: {allowed}.",
+    "missing": "Missing required field {path}{where}.",
+    "wrong_type": "Wrong data type at {path}{where}: received {received}, expected {allowed}.",
+    "unknown_keys": "Unrecognized fields at {path}{where}: {keys}.",
+    "phase_status": "Phase {path}{where} has \"status\": a phase status is derived from its items. Remove that field.",
+    "duplicate_id": "Repeated id \"{received}\" at {path}{where}. Each item needs a unique id.",
+    "invalid_date": "Invalid date \"{received}\" at {path}{where}. Use ISO 8601 with offset, for example 2026-10-11T08:00:00-05:00.",
+    "range_order": "Invalid range {received} at {path}{where}: the minimum cannot be greater than the maximum.",
+    "invalid": "Invalid value at {path}{where}.",
+    "root": "the root",
+    "where": " ({where})"
+  },
+  "load": {
+    "loading": "Loading plan.json…",
+    "notFoundTitle": "plan.json not found",
+    "notFound": "The file {path} does not exist. Create it (you can copy ejemplos/plan.json) or set another path with --plan or in plan-vivo.config.json.",
+    "invalidJsonTitle": "plan.json is not valid JSON",
+    "invalidJson": "Could not parse {path}: {detail}",
+    "networkTitle": "Could not read plan.json",
+    "network": "The viewer server did not respond. Check that pnpm visor is still running.",
+    "retry": "The viewer tries again when the file changes."
+  }
+}

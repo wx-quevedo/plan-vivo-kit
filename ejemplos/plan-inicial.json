@@ -1,0 +1,29 @@
+{
+  "$schema": "plan-vivo/schema/plan.schema.json",
+  "schema": 1,
+  "project": "mi-proyecto",
+  "title": "Mi proyecto",
+  "updated_at": "2026-10-12T09:00:00-05:00",
+  "phases": [
+    {
+      "id": "F1",
+      "name": "Base",
+      "items": [
+        {
+          "id": "P1",
+          "type": "prompt",
+          "title": "Estructura inicial del repositorio",
+          "status": "pending",
+          "estimate_min": [30, 60],
+          "difficulty": 3,
+          "work_log": [],
+          "summary": "",
+          "steps": [],
+          "files_changed": 0,
+          "notes": ""
+        }
+      ]
+    },
+    { "id": "F2", "name": "Funciones principales", "estimate_min": [240, 480], "items": [] }
+  ]
+}

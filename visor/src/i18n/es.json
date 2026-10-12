@@ -1,0 +1,123 @@
+{
+  "app": {
+    "subtitle": "Plan vivo",
+    "updated": "Actualizado: {date}",
+    "language": "Idioma",
+    "langEs": "ES",
+    "langEn": "EN",
+    "timezone": "Hora de {zone}",
+    "file": "Archivo: {path}"
+  },
+  "status": {
+    "pending": "Pendiente",
+    "in_progress": "En curso",
+    "needs_you": "Te necesita",
+    "done": "Terminado",
+    "problem": "Problema"
+  },
+  "type": {
+    "prompt": "Prompt",
+    "gate": "Puerta",
+    "unplanned": "Imprevisto"
+  },
+  "actor": {
+    "orchestrator": "Orquestador",
+    "coding_agent": "Agente de código",
+    "subagent": "Subagente",
+    "human": "Humano"
+  },
+  "legend": {
+    "title": "Leyenda",
+    "unplanned": "Imprevisto",
+    "gate": "Puerta de aprobación"
+  },
+  "phases": {
+    "title": "Fases",
+    "back": "Fases",
+    "summary": "{status} · {done} de {total}",
+    "empty": "Sin items definidos",
+    "noItems": "Esta fase todavía no tiene items definidos.",
+    "open": "Abrir la fase {id} {name}",
+    "progress": "Avance {percent} %",
+    "estimate": "Estimado {range}",
+    "real": "Real {duration}",
+    "selectHint": "Toca un item para ver su detalle."
+  },
+  "console": {
+    "command": "plan show {id}",
+    "title": "título",
+    "type": "tipo",
+    "status": "estado",
+    "estimate": "estimado",
+    "real": "real",
+    "overBy": "{duration} sobre el máximo",
+    "withinEstimate": "dentro del estimado",
+    "started": "inicio",
+    "ended": "fin",
+    "summary": "resumen",
+    "steps": "pasos",
+    "commits": "commits",
+    "files": "archivos cambiados",
+    "notes": "notas",
+    "none": "sin datos",
+    "close": "Cerrar",
+    "worklog": "tramos",
+    "pauses": "pausas",
+    "pauseCount": "{count} pausas, {duration} en total",
+    "pauseOne": "1 pausa, {duration}"
+  },
+  "timeline": {
+    "title": "Línea de tiempo",
+    "estimate": "Estimado",
+    "projected": "Proyectado",
+    "unestimated": "sin estimar",
+    "now": "ahora",
+    "betweenPrompts": "entre prompts",
+    "projectEnd": "Faltan {remaining} · cierre aprox. {date}",
+    "unestimatedOne": "(sin contar 1 fase sin estimar)",
+    "unestimatedMany": "(sin contar {count} fases sin estimar)",
+    "projectEndUnknown": "Cierre aproximado: sin datos suficientes",
+    "factor": "Factor de calibración ×{factor}, según {count} items terminados (tiempo real / estimado medio). Trabajo continuo desde ahora.",
+    "factorOne": "Factor de calibración ×{factor}, según 1 item terminado (tiempo real / estimado medio). Trabajo continuo desde ahora.",
+    "factorNone": "Sin items terminados para calibrar: se proyecta con el estimado medio (factor ×1). Trabajo continuo desde ahora.",
+    "rowLabel": "Ver la fase {id} {name}",
+    "scopePlan": "Todo el plan",
+    "scopeReal": "Solo lo trabajado",
+    "scopeLabel": "Rango de la línea de tiempo",
+    "waiting": "en espera"
+  },
+  "map": {
+    "title": "Mapa",
+    "here": "Estás aquí",
+    "station": "Ir a la fase {id} {name}"
+  },
+  "error": {
+    "title": "plan.json no cumple el esquema",
+    "intro": "El visor no puede dibujar el plan. Corrige estos puntos: el visor se recarga solo al guardar plan.json.",
+    "countOne": "1 problema encontrado",
+    "countOther": "{count} problemas encontrados",
+    "invalid_status": "Estado no válido \"{received}\" en {path}{where}. Valores permitidos: {allowed}.",
+    "invalid_item_type": "Tipo de item no válido \"{received}\" en {path}{where}. Valores permitidos: {allowed}.",
+    "invalid_value": "Valor no válido \"{received}\" en {path}{where}. Valores permitidos: {allowed}.",
+    "missing": "Falta el campo obligatorio {path}{where}.",
+    "wrong_type": "Tipo de dato incorrecto en {path}{where}: se recibió {received}, se esperaba {allowed}.",
+    "unknown_keys": "Campos no reconocidos en {path}{where}: {keys}.",
+    "phase_status": "La fase {path}{where} tiene \"status\": el estado de una fase se calcula desde sus items. Quita ese campo.",
+    "duplicate_id": "Id repetido \"{received}\" en {path}{where}. Cada item necesita un id único.",
+    "invalid_date": "Fecha no válida \"{received}\" en {path}{where}. Usa ISO 8601 con zona, por ejemplo 2026-10-11T08:00:00-05:00.",
+    "range_order": "Rango no válido {received} en {path}{where}: el mínimo no puede ser mayor que el máximo.",
+    "invalid": "Valor no válido en {path}{where}.",
+    "root": "la raíz",
+    "where": " ({where})"
+  },
+  "load": {
+    "loading": "Cargando plan.json…",
+    "notFoundTitle": "No encontré plan.json",
+    "notFound": "No existe el archivo {path}. Créalo (puedes copiar ejemplos/plan.json) o indica otra ruta con --plan o en plan-vivo.config.json.",
+    "invalidJsonTitle": "plan.json no es JSON válido",
+    "invalidJson": "No se pudo interpretar {path}: {detail}",
+    "networkTitle": "No se pudo leer plan.json",
+    "network": "El servidor del visor no respondió. Revisa que pnpm visor siga en marcha.",
+    "retry": "El visor vuelve a intentarlo cuando el archivo cambia."
+  }
+}

@@ -1,0 +1,178 @@
+{
+  "$schema": "../schema/plan.schema.json",
+  "schema": 1,
+  "project": "agenda-citas",
+  "title": "Agenda de citas",
+  "updated_at": "2026-10-09T15:00:00-05:00",
+  "status_values": ["pending", "in_progress", "needs_you", "done", "problem"],
+  "item_types": ["prompt", "gate", "unplanned"],
+  "phases": [
+    {
+      "id": "F1",
+      "name": "Base del proyecto",
+      "items": [
+        {
+          "id": "P1",
+          "type": "prompt",
+          "title": "Repositorio y estructura inicial",
+          "status": "done",
+          "estimate_min": [30, 60],
+          "difficulty": 3,
+          "work_log": [
+            { "actor": "orchestrator", "start": "2026-10-05T09:00:00-05:00", "end": "2026-10-05T09:06:00-05:00", "note": "redacta el prompt", "commits": [] },
+            { "actor": "coding_agent", "start": "2026-10-05T09:06:00-05:00", "end": "2026-10-05T09:44:00-05:00", "note": "", "commits": ["3f1a9c2", "8be04d7"] },
+            { "actor": "orchestrator", "start": "2026-10-05T09:47:00-05:00", "end": "2026-10-05T09:55:00-05:00", "note": "verifica el resultado", "commits": [] }
+          ],
+          "summary": "Monorepo con web y API, pruebas y lint funcionando.",
+          "steps": ["Workspace de pnpm con web/ y api/", "Vitest y ESLint en ambos paquetes", "README con los comandos"],
+          "files_changed": 14,
+          "notes": ""
+        },
+        {
+          "id": "P2",
+          "type": "prompt",
+          "title": "Base de datos y modelo de citas",
+          "status": "done",
+          "estimate_min": [60, 120],
+          "difficulty": 5,
+          "work_log": [
+            { "actor": "coding_agent", "start": "2026-10-05T10:30:00-05:00", "end": "2026-10-05T11:38:00-05:00", "note": "", "commits": ["c41d6e0"] },
+            { "actor": "subagent", "start": "2026-10-05T10:52:00-05:00", "end": "2026-10-05T11:14:00-05:00", "note": "subagente 5e2b9a17", "commits": [] },
+            { "actor": "human", "start": "2026-10-05T11:38:00-05:00", "end": "2026-10-05T11:51:00-05:00", "note": "espera: pregunta (AskUserQuestion)", "commits": [] },
+            { "actor": "coding_agent", "start": "2026-10-05T11:51:00-05:00", "end": "2026-10-05T12:09:00-05:00", "note": "", "commits": ["a7720f3"] }
+          ],
+          "summary": "SQLite con migraciones y el modelo de citas, profesionales y horarios.",
+          "steps": ["Migraciones 0001 y 0002", "Modelo de citas con validación de solapes", "Datos de ejemplo para desarrollo"],
+          "files_changed": 9,
+          "notes": "La persona eligió SQLite en lugar de Postgres para el primer año."
+        },
+        {
+          "id": "U1",
+          "type": "unplanned",
+          "title": "Migraciones rotas en Windows",
+          "status": "done",
+          "estimate_min": null,
+          "work_log": [
+            { "actor": "coding_agent", "start": "2026-10-05T12:20:00-05:00", "end": "2026-10-05T12:41:00-05:00", "note": "", "commits": ["0d93b5e"] }
+          ],
+          "summary": "Las rutas de las migraciones usaban barras de Unix; ahora se arman con path.join.",
+          "steps": ["Prueba que reproduce el fallo", "Rutas con path.join"],
+          "files_changed": 2,
+          "notes": "Apareció al correr P2 en la máquina de la persona."
+        },
+        {
+          "id": "G1",
+          "type": "gate",
+          "title": "Puerta G1: revisión de la base",
+          "status": "done",
+          "estimate_min": [10, 20],
+          "work_log": [
+            { "actor": "human", "start": "2026-10-05T15:00:00-05:00", "end": "2026-10-05T15:14:00-05:00", "note": "revisión y aprobación", "commits": [] }
+          ],
+          "summary": "La persona aprobó la base y el modelo de datos.",
+          "steps": [],
+          "files_changed": 0,
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "F2",
+      "name": "Reservas",
+      "items": [
+        {
+          "id": "P3",
+          "type": "prompt",
+          "title": "Calendario de disponibilidad",
+          "status": "done",
+          "estimate_min": [90, 150],
+          "difficulty": 6,
+          "work_log": [
+            { "actor": "orchestrator", "start": "2026-10-08T09:00:00-05:00", "end": "2026-10-08T09:08:00-05:00", "note": "redacta el prompt", "commits": [] },
+            { "actor": "coding_agent", "start": "2026-10-08T09:08:00-05:00", "end": "2026-10-08T10:31:00-05:00", "note": "", "commits": ["5c0e7a1", "e92f4b8"] },
+            { "actor": "coding_agent", "start": "2026-10-08T10:52:00-05:00", "end": "2026-10-08T11:20:00-05:00", "note": "", "commits": ["17ad3c9"] },
+            { "actor": "orchestrator", "start": "2026-10-08T11:20:00-05:00", "end": "2026-10-08T11:31:00-05:00", "note": "verifica el resultado", "commits": [] }
+          ],
+          "summary": "Vista semanal con los horarios libres de cada profesional.",
+          "steps": ["Cálculo de huecos libres", "Vista semanal y diaria", "Pruebas de punta a punta"],
+          "files_changed": 11,
+          "notes": ""
+        },
+        {
+          "id": "P4",
+          "type": "prompt",
+          "title": "Formulario de reserva",
+          "status": "in_progress",
+          "estimate_min": [60, 90],
+          "difficulty": 5,
+          "work_log": [
+            { "actor": "coding_agent", "start": "2026-10-09T13:00:00-05:00", "end": "2026-10-09T13:58:00-05:00", "note": "", "commits": ["b3e8d21"] },
+            { "actor": "human", "start": "2026-10-09T13:58:00-05:00", "end": "2026-10-09T14:12:00-05:00", "note": "espera: pregunta (AskUserQuestion)", "commits": [] },
+            { "actor": "coding_agent", "start": "2026-10-09T14:12:00-05:00", "end": "2026-10-09T14:40:00-05:00", "note": "", "commits": [] }
+          ],
+          "summary": "",
+          "steps": [],
+          "files_changed": 0,
+          "notes": ""
+        },
+        {
+          "id": "P5",
+          "type": "prompt",
+          "title": "Confirmación por correo",
+          "status": "pending",
+          "estimate_min": [45, 90],
+          "difficulty": 4,
+          "work_log": [],
+          "summary": "",
+          "steps": [],
+          "files_changed": 0,
+          "notes": ""
+        },
+        {
+          "id": "G2",
+          "type": "gate",
+          "title": "Puerta G2: una reserva real de punta a punta",
+          "status": "pending",
+          "estimate_min": [15, 30],
+          "work_log": [],
+          "summary": "",
+          "steps": [],
+          "files_changed": 0,
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "F3",
+      "name": "Avisos y cierre",
+      "items": [
+        {
+          "id": "P6",
+          "type": "prompt",
+          "title": "Recordatorios 24 h antes de la cita",
+          "status": "pending",
+          "estimate_min": [60, 120],
+          "difficulty": 5,
+          "work_log": [],
+          "summary": "",
+          "steps": [],
+          "files_changed": 0,
+          "notes": ""
+        },
+        {
+          "id": "P7",
+          "type": "prompt",
+          "title": "Panel de administración",
+          "status": "pending",
+          "estimate_min": [120, 180],
+          "difficulty": 7,
+          "work_log": [],
+          "summary": "",
+          "steps": [],
+          "files_changed": 0,
+          "notes": ""
+        }
+      ]
+    }
+  ]
+}

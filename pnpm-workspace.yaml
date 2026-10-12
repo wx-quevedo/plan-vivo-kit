@@ -1,0 +1,7 @@
+packages:
+  - visor
+  - tiempos
+
+# esbuild usa el binario de sus dependencias opcionales; no necesita su script de instalación.
+allowBuilds:
+  esbuild: false

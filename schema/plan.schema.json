@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plan-vivo.local/schema/plan.schema.json",
+  "title": "plan.json del plan vivo",
+  "description": "Plan de un proyecto dividido en fases e items, con el registro de trabajo real de cada item. Es el mismo formato que valida el visor (visor/src/plan/schema.ts). Tres reglas no se pueden expresar en JSON Schema y solo las valida el visor: el fin de cada tramo debe ser posterior a su inicio, el mínimo de un rango no puede superar al máximo, y los ids de los items no se repiten en todo el plan.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "project", "title", "updated_at", "phases"],
+  "properties": {
+    "$schema": {
+      "description": "Opcional: ruta a este JSON Schema, para que el editor valide y complete el archivo.",
+      "type": "string"
+    },
+    "schema": {
+      "description": "Versión del formato. Siempre 1.",
+      "const": 1
+    },
+    "project": {
+      "description": "Identificador corto del proyecto, sin espacios (por ejemplo agenda-citas).",
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "description": "Título que muestra el visor en el encabezado.",
+      "type": "string",
+      "minLength": 1
+    },
+    "updated_at": {
+      "description": "Última actualización a mano del plan, en ISO 8601 con zona (por ejemplo 2026-10-09T15:30:00-05:00).",
+      "$ref": "#/$defs/fecha"
+    },
+    "status_values": {
+      "description": "Opcional y solo informativo: copia de los estados permitidos, para quien lea el archivo.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/estado" }
+    },
+    "item_types": {
+      "description": "Opcional y solo informativo: copia de los tipos de item permitidos.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/tipo" }
+    },
+    "phases": {
+      "description": "Fases del proyecto, en orden. Al menos una.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/fase" }
+    }
+  },
+  "$defs": {
+    "fecha": {
+      "description": "Fecha y hora ISO 8601 con zona explícita (desfase como -05:00, o Z).",
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?(Z|[+-]\\d{2}:\\d{2})$"
+    },
+    "rango": {
+      "description": "Rango de minutos [mínimo, máximo], con mínimo menor o igual que máximo.",
+      "type": "array",
+      "prefixItems": [
+        { "type": "integer", "minimum": 0 },
+        { "type": "integer", "minimum": 0 }
+      ],
+      "items": false,
+      "minItems": 2
+    },
+    "estado": {
+      "description": "pending: sin empezar. in_progress: en curso. needs_you: espera una acción de la persona. done: terminado. problem: bloqueado por un problema.",
+      "enum": ["pending", "in_progress", "needs_you", "done", "problem"]
+    },
+    "tipo": {
+      "description": "prompt: trabajo encargado al agente. gate: puerta de aprobación de la persona. unplanned: imprevisto que apareció durante el trabajo.",
+      "enum": ["prompt", "gate", "unplanned"]
+    },
+    "actor": {
+      "description": "Quién trabajó en el tramo. orchestrator: quien planifica, escribe los prompts y verifica. coding_agent: el agente de código. subagent: un subagente lanzado por el agente. human: la persona dueña del proyecto (aprobaciones, comandos con sudo, respuestas).",
+      "enum": ["orchestrator", "coding_agent", "subagent", "human"]
+    },
+    "tramo": {
+      "description": "Tramo de trabajo real. Las pausas no se registran: son los huecos entre tramos. El fin debe ser posterior al inicio.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor", "start", "end"],
+      "properties": {
+        "actor": { "$ref": "#/$defs/actor" },
+        "start": { "description": "Inicio del tramo.", "$ref": "#/$defs/fecha" },
+        "end": { "description": "Fin del tramo.", "$ref": "#/$defs/fecha" },
+        "note": { "description": "Nota corta (por ejemplo, el motivo de una espera).", "type": "string" },
+        "commits": {
+          "description": "Commits hechos dentro del tramo (hash corto). Los asigna el script de tiempos.",
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "item": {
+      "description": "Unidad de trabajo de una fase. Inicio, fin, tiempo real y commits no se escriben: se derivan de work_log.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "title", "status"],
+      "properties": {
+        "id": { "description": "Id único en todo el plan (por ejemplo P4, G1, U2).", "type": "string", "minLength": 1 },
+        "type": { "$ref": "#/$defs/tipo" },
+        "title": { "description": "Título corto del item.", "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/estado" },
+        "estimate_min": {
+          "description": "Estimado en minutos [mínimo, máximo], o null si no se estimó (típico en un imprevisto).",
+          "oneOf": [{ "$ref": "#/$defs/rango" }, { "type": "null" }]
+        },
+        "difficulty": { "description": "Dificultad de 1 a 10.", "type": "integer", "minimum": 1, "maximum": 10 },
+        "work_log": {
+          "description": "Tramos de trabajo real. Lo escribe el script de tiempos; no se edita a mano.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/tramo" }
+        },
+        "summary": { "description": "Resumen de una línea, al cerrar el item.", "type": "string" },
+        "steps": { "description": "Lista corta de lo que se hizo.", "type": "array", "items": { "type": "string" } },
+        "files_changed": { "description": "Cantidad de archivos cambiados.", "type": "integer", "minimum": 0 },
+        "notes": { "description": "Notas libres: hallazgos, pendientes, decisiones.", "type": "string" }
+      }
+    },
+    "fase": {
+      "description": "Fase del proyecto. No lleva status: se deriva de sus items (problem > needs_you > done > in_progress > pending).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "items"],
+      "properties": {
+        "id": { "description": "Id de la fase (por ejemplo F1).", "type": "string", "minLength": 1 },
+        "name": { "description": "Nombre de la fase.", "type": "string", "minLength": 1 },
+        "estimate_min": {
+          "description": "Estimado de la fase en minutos [mínimo, máximo]. Solo se usa cuando ningún item tiene estimado, para proyectar fases todavía sin items.",
+          "$ref": "#/$defs/rango"
+        },
+        "items": { "description": "Items de la fase, en orden.", "type": "array", "items": { "$ref": "#/$defs/item" } }
+      }
+    }
+  }
+}

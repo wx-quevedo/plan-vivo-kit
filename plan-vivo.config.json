@@ -1,0 +1,6 @@
+{
+  "$comentario": "Rutas relativas a esta carpeta. Al instalar el kit en un proyecto, cambia plan a ../plan.json.",
+  "plan": "ejemplos/plan.json",
+  "puerto": 5190,
+  "zonaHoraria": "America/Guayaquil"
+}

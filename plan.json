@@ -3,7 +3,7 @@
   "schema": 1,
   "project": "plan-vivo",
   "title": "Plan vivo (kit)",
-  "updated_at": "2026-10-12T09:43:00-05:00",
+  "updated_at": "2026-10-12T09:55:00-05:00",
   "phases": [
     {
       "id": "F0",
@@ -44,6 +44,25 @@
           ],
           "files_changed": 76,
           "notes": "Sin estimado previo: fue una tarea aparte, fuera del plan de server-monitor. Defectos encontrados y corregidos: la recarga perdía el segundo de dos guardados seguidos en Windows (ahora fs.watchFile), y --aplicar borraba los tramos del orquestador (ahora se conservan). La sesión de Claude Code es la de server-monitor: tiempos corre con --sesiones apuntando a esa carpeta, y los mensajes de Monitor quedan sin asignar aquí."
+        }
+      ]
+    },
+    {
+      "id": "F1",
+      "name": "Uso desde otros proyectos",
+      "items": [
+        {
+          "id": "P2",
+          "type": "prompt",
+          "title": "plan-vivo usable desde cualquier proyecto, sin copiarlo",
+          "status": "in_progress",
+          "estimate_min": [40, 70],
+          "difficulty": 6,
+          "work_log": [],
+          "summary": "",
+          "steps": [],
+          "files_changed": 0,
+          "notes": ""
         }
       ]
     }

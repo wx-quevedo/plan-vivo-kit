@@ -71,6 +71,27 @@ Prioridad: **alta** si da datos falsos o impide usar el kit; **media** si molest
 - **Cómo reproducirlo:** dos sesiones en máquinas distintas con commits intercalados al mismo repositorio; correr tiempos solo con las sesiones de una.
 - **Prioridad:** baja.
 
+### 2026-10-13 · El identificador ignora la fase y los ids de item chocan entre fases
+
+- **Proyecto de origen:** SkyNest (`E:\Test\SkyNest`), F7B · U2.
+- **Qué pasa:** el plan de SkyNest numera los items por fase (F6C · P1, F6D · P1, CONT · G1…), pero el esquema exige ids únicos en todo el plan y `tiempos` toma solo el grupo del item ("P1") de "F6C · P1:". Además, la expresión por defecto exige un número en la fase, así que ART, TRIO o CONT no se reconocen. Rodeo en SkyNest: el id de cada item es el identificador completo ("F7B · U2") y `tiempos` se corre con `--identificador '\b([A-Z][A-Z0-9]* \u00b7 [A-Za-z]+\d+[a-z]?)\s*:'`. Mejora posible: resolver el identificador por fase más item (buscar el item dentro de la fase indicada) y aceptar fases sin número.
+- **Cómo reproducirlo:** un plan con dos fases que tengan un item P1 cada una; `pnpm validar` da `duplicate_id`. Con ids distintos, un prompt "TRIO · P2:" queda sin asignar con la expresión por defecto.
+- **Prioridad:** alta.
+
+### 2026-10-13 · El punto medio del --identificador llega corrupto desde Git Bash en Windows
+
+- **Proyecto de origen:** SkyNest (`E:\Test\SkyNest`), F7B · U2.
+- **Qué pasa:** `pnpm --dir <kit> tiempos -- --identificador '...· ...'` desde Git Bash en Windows no reconoce ningún identificador: el carácter "·" llega cambiado al proceso de Node (página de códigos). Con `\u00b7` en su lugar funciona. AGENTES.md podría recomendar escribirlo así, o el kit podría normalizar la opción.
+- **Cómo reproducirlo:** en Git Bash, correr tiempos con `--identificador '\b[A-Z]+\d+ · ([A-Za-z]+\d+)\s*:'` sobre una sesión con "F1 · P1:": el mensaje sale "sin identificador".
+- **Prioridad:** media.
+
+### 2026-10-13 · Un subagente reanudado se cuenta como un solo tramo y se copia entero a cada item
+
+- **Proyecto de origen:** SkyNest (`E:\Test\SkyNest`), F7B · U2.
+- **Qué pasa:** un subagente que se reanuda con SendMessage en varios prompts (`agent-ad881dedc45fa9392.jsonl`, de 13:21 a 21:17 con largas pausas) sale como un tramo continuo de 8 h. Con `"subagentes": { "<id>": ["P1", "P3", "P4", "P5"] }` el tramo completo se copia en los cuatro items, en vez de repartir cada tramo de actividad al item abierto en ese momento. Rodeo en SkyNest: `"<id>": []` (sin item). Mejora posible: partir los subagentes por huecos de inactividad (o por cada reanudación) y asignar cada parte al item abierto.
+- **Cómo reproducirlo:** reanudar un mismo subagente en dos prompts separados por horas y correr tiempos.
+- **Prioridad:** media.
+
 ## Resueltos
 
 ### 2026-10-12 · El identificador del prompt no se reconoce si el entorno antepone un bloque al mensaje

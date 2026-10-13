@@ -1,6 +1,7 @@
 // Lectura de los registros JSONL de sesión de Claude Code, SOLO LECTURA.
 // Privacidad: de cada registro se usan únicamente la marca de tiempo, el tipo de evento y, de los
-// mensajes humanos, la PRIMERA línea (para identificar el item). Nada más se copia, guarda ni imprime.
+// mensajes humanos, la PRIMERA línea con contenido, después de los bloques que agrega el entorno (para identificar
+// el item). Nada más se copia, guarda ni imprime.
 // Para extraer esos campos hay que interpretar cada línea JSON en memoria; el resto se descarta.
 import { readFileSync } from 'node:fs'
 import { basename } from 'node:path'
@@ -63,11 +64,46 @@ function contentOf(file: string, line: number, record: Json): unknown[] {
   return content
 }
 
-// Primera línea del primer bloque de texto; el resto del mensaje no se lee.
+// Bloques que el entorno agrega delante del mensaje de la persona (la extensión de VS Code, Claude in Chrome):
+// se saltan completos, hasta su etiqueta de cierre.
+const BLOQUES_DEL_ENTORNO = ['browser_instruction', 'system-reminder', 'ide_selection', 'ide_opened_file', 'ide_diagnostics']
+// Envoltorios: se salta solo la etiqueta; lo que envuelven es el mensaje (por ejemplo, un prompt pegado).
+const ENVOLTORIOS = ['pasted_content']
+const APERTURA = /^<([a-z][a-z_-]*)(?:\s[^>]*)?>/
+const CIERRE = /^<\/([a-z][a-z_-]*)(?:\s[^>]*)?>/
+
+// Primera línea con contenido del mensaje, después de los bloques del entorno; de ahí sale el identificador.
+// Las líneas que se saltan se descartan sin guardarse, igual que el resto del mensaje.
 function firstLineOf(content: unknown[]): string {
-  const block = content.find((b) => typeof b === 'object' && b !== null && (b as Json).type === 'text') as Json | undefined
-  const text = typeof block?.text === 'string' ? block.text : ''
-  return text.split('\n', 1)[0]
+  const textos = content
+    .filter((b) => typeof b === 'object' && b !== null && (b as Json).type === 'text' && typeof (b as Json).text === 'string')
+    .map((b) => (b as Json).text as string)
+  const lineas = textos.join('\n').split('\n')
+  for (let i = 0; i < lineas.length; i++) {
+    const linea = lineas[i].trimStart()
+    if (linea.trim() === '') continue
+    const apertura = APERTURA.exec(linea)
+    const cierre = CIERRE.exec(linea)
+    if (apertura && BLOQUES_DEL_ENTORNO.includes(apertura[1])) {
+      // Hasta la etiqueta de cierre, que puede estar en la misma línea; lo que sigue a ella vuelve a revisarse.
+      const fin = `</${apertura[1]}`
+      let j = i
+      while (j < lineas.length && !lineas[j].includes(fin)) j++
+      if (j === lineas.length) return ''
+      const desde = lineas[j].indexOf(fin)
+      lineas[j] = lineas[j].slice(lineas[j].indexOf('>', desde) + 1)
+      i = j - 1
+      continue
+    }
+    if (apertura && ENVOLTORIOS.includes(apertura[1])) {
+      lineas[i] = linea.slice(apertura[0].length)
+      i--
+      continue
+    }
+    if (cierre && ENVOLTORIOS.includes(cierre[1])) continue
+    return lineas[i]
+  }
+  return ''
 }
 
 export function readSession(file: string): SessionEvent[] {

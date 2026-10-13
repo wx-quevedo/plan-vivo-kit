@@ -154,3 +154,53 @@ describe('mensajes excluidos (null en asignaciones.json)', () => {
     expect(() => leerAsignaciones(ruta)).toThrow(/esperas\.2026-10-11T10:00:00\.000Z debe ser un texto$/)
   })
 })
+
+describe('bloques que agrega el entorno delante del mensaje', () => {
+  const conBloques = (hm: string, bloques: string[]) => ({
+    type: 'user',
+    timestamp: Z(hm),
+    origin: { kind: 'human' },
+    message: { content: bloques.map((text) => ({ type: 'text', text })) },
+  })
+  const primera = (bloques: string[]) => {
+    const [evento] = eventos([conBloques('10:00', bloques)])
+    return evento.kind === 'human' ? evento.firstLine : null
+  }
+
+  it('Claude in Chrome en la extensión de VS Code: el identificador está dentro del prompt pegado, en otro bloque', () => {
+    const bloques = [
+      '<browser_instruction># Claude in Chrome\nInstrucciones largas\n</browser_instruction>',
+      '\n<pasted_content id="834c">\nF1 · P1: Arranque\nresto\n</pasted_content id="834c">',
+    ]
+    expect(primera(bloques)).toBe('F1 · P1: Arranque')
+    const p = proponer({
+      eventos: eventos([conBloques('10:00', bloques), agente('10:20')]),
+      subagentes: [],
+      commits: [],
+      asignaciones: SIN_ASIGNACIONES,
+      items: new Set(['P1']),
+    })
+    expect(p.sinAsignar).toEqual([])
+    expect(p.porItem.get('P1')).toHaveLength(1)
+  })
+
+  it('también en un solo bloque, con varios bloques seguidos o con el cierre en la misma línea', () => {
+    expect(primera(['<system-reminder>a\nb</system-reminder>\n<ide_selection>x</ide_selection>\n\nF2 · P6b: algo'])).toBe('F2 · P6b: algo')
+    expect(primera(['<ide_opened_file>archivo</ide_opened_file>F1 · P3: en la misma línea'])).toBe('F1 · P3: en la misma línea')
+    expect(primera(['<pasted_content id="1">F1 · P4: pegado sin salto'])).toBe('F1 · P4: pegado sin salto')
+  })
+
+  it('un pegado vacío no oculta lo que sigue', () => {
+    expect(primera(['<pasted_content id="1">\n</pasted_content id="1">\nF1 · P5: después'])).toBe('F1 · P5: después')
+  })
+
+  it('un mensaje sin bloques, o que empieza con otra etiqueta, queda igual que antes', () => {
+    expect(primera(['F1 · P2: normal\nsegunda línea'])).toBe('F1 · P2: normal')
+    expect(primera(['<div> no es del entorno'])).toBe('<div> no es del entorno')
+    expect(primera(['\n\n  F1 · P2: con líneas vacías antes'])).toBe('  F1 · P2: con líneas vacías antes')
+  })
+
+  it('un bloque del entorno sin cierre no deja pasar nada de su contenido', () => {
+    expect(primera(['<browser_instruction>\nF1 · P9: esto es del entorno'])).toBe('')
+  })
+})

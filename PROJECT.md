@@ -100,4 +100,4 @@ Aprobadas por Washington el 2026-10-12.
 - En otra PC, o si se borran, las skills de autoskills se reinstalan con `npx autoskills -a claude-code` en la raíz del kit.
 - server-monitor, al aplicar D37 en F3: borrar su copia del visor y de `scripts/tiempos`, pegar el bloque nuevo de `snippet-claude.md` en su `CLAUDE.md` y correr los comandos del kit con `--plan C:\xampp\htdocs\server-monitor\plan.json --asignaciones C:\xampp\htdocs\server-monitor\scripts\tiempos\asignaciones.json` (o mover sus asignaciones junto al plan). Su plan no tiene `schema_version`: migrarlo desde allá con `pnpm migrar`.
 - Resolver la entrada abierta de `PENDIENTES.md` (marcas del eje con horario de verano).
-- K5: repositorio privado en GitHub para la Mac, cuando Washington lo pida.
+- K5: repositorio privado en GitHub, cuando Washington lo pida. Además de la Mac, sirve para que los orquestadores de otras cuentas (que no ven esta PC) lean AGENTES.md y la skill desde el repositorio, en lugar de depender de rutas locales. Al hacerlo, revisar qué dice la skill: la ruta del kit cambiaría en cada copia.

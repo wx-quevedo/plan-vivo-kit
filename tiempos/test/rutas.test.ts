@@ -18,7 +18,7 @@ function kit(config?: object): string {
 
 describe('argumentos', () => {
   it('ignora el "--" que deja pasar pnpm <comando> -- <argumentos>', () => {
-    expect(leerArgumentos(['--', '--plan', 'p.json', '--aplicar'])).toEqual({ valores: { plan: 'p.json' }, config: undefined, resto: ['--aplicar'] })
+    expect(leerArgumentos(['--', '--plan', 'p.json', '--aplicar'])).toEqual({ valores: { plan: 'p.json' }, config: undefined, resto: ['--aplicar'], masPlanes: [] })
   })
 
   it('--sesiones se puede repetir, también con la forma --sesiones=<carpeta>', () => {
@@ -85,6 +85,38 @@ describe('prioridad de rutas: argumento, luego archivo, luego defecto', () => {
     expect(() => leerConfiguracion([], {}, { raiz: kit({ sesiones: [] }) })).toThrow(/sesiones tiene un tipo no válido/)
     expect(() => leerConfiguracion([], {}, { raiz: kit({ sesiones: ['a', 3] }) })).toThrow(/sesiones tiene un tipo no válido/)
     expect(() => leerConfiguracion([], {}, { raiz: kit({ sesiones: ['a', ''] }) })).toThrow(/sesiones tiene un tipo no válido/)
+  })
+})
+
+describe('varios planes en el visor', () => {
+  it('solo con variosPlanes, --plan se puede repetir; el primero es plan y planes los lleva a todos', () => {
+    const desde = dir()
+    expect(() => leerConfiguracion(['--plan', 'a.json', '--plan', 'b.json'], { INIT_CWD: desde }, { raiz: kit() })).toThrow(/--plan se indicó más de una vez/)
+    expect(() => leerConfiguracion(['--plan', 'a.json', '--plan', 'b.json'], { INIT_CWD: desde }, { raiz: kit(), variosPlanes: true })).not.toThrow()
+    const c = leerConfiguracion(['--plan', 'a.json', '--plan', 'b.json'], { INIT_CWD: desde }, { raiz: kit(), variosPlanes: true })
+    expect(c.plan).toBe(join(desde, 'a.json'))
+    expect(c.planes).toEqual([join(desde, 'a.json'), join(desde, 'b.json')])
+    expect(c.planesDelArchivo).toEqual([])
+  })
+
+  it('la lista planes del archivo se suma después, con sus rutas relativas a la carpeta del archivo y sin repetidos', () => {
+    const raiz = kit({ plan: 'p.json', planes: ['otro/plan.json', 'p.json'] })
+    const c = leerConfiguracion([], {}, { raiz, variosPlanes: true })
+    expect(c.planes).toEqual([join(raiz, 'p.json'), join(raiz, 'otro', 'plan.json')])
+    expect(c.planesDelArchivo).toEqual([join(raiz, 'otro', 'plan.json'), join(raiz, 'p.json')])
+    expect(c.origen.planes).toBe('archivo')
+  })
+
+  it('planes debe ser una lista de rutas no vacía; una ruta suelta no vale', () => {
+    expect(() => leerConfiguracion([], {}, { raiz: kit({ planes: 'a.json' }) })).toThrow(/planes tiene un tipo no válido/)
+    expect(() => leerConfiguracion([], {}, { raiz: kit({ planes: [] }) })).toThrow(/planes tiene un tipo no válido/)
+    expect(() => leerConfiguracion([], {}, { raiz: kit({ planes: ['a.json', ''] }) })).toThrow(/planes tiene un tipo no válido/)
+  })
+
+  it('un plan de la lista que no existe: el mensaje dice que salió del archivo', () => {
+    const raiz = kit({ planes: ['falta/plan.json'] })
+    const c = leerConfiguracion([], {}, { raiz, variosPlanes: true })
+    expect(() => exigirRuta(c, 'planes', c.planesDelArchivo[0])).toThrow(`No existe el plan: ${join(raiz, 'falta', 'plan.json')} (indicada en ${join(raiz, 'plan-vivo.config.json')})`)
   })
 })
 

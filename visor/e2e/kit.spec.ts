@@ -1,38 +1,12 @@
 // Uso desde otro proyecto (decisión K1): el kit no se copia. Desde la carpeta de un proyecto que solo tiene su
 // plan.json, se levanta el visor del kit con pnpm --dir <kit> visor -- --plan plan.json (ruta relativa a esa carpeta).
 import { spawn, execFileSync, type ChildProcess } from 'node:child_process'
-import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { expect, test } from '@playwright/test'
 import { AHORA, KIT, PUERTO_KIT } from './config'
-
-// Entorno limpio: sin las variables PLAN_VIVO_* ni el INIT_CWD de quien corre las pruebas.
-function entornoLimpio(): NodeJS.ProcessEnv {
-  const entorno = { ...process.env }
-  for (const clave of Object.keys(entorno)) if (clave.startsWith('PLAN_VIVO_') || clave === 'INIT_CWD') delete entorno[clave]
-  return entorno
-}
-
-async function esperarServidor(url: string, proceso: ChildProcess, salida: () => string): Promise<void> {
-  const limite = Date.now() + 60_000
-  while (Date.now() < limite) {
-    if (proceso.exitCode !== null) throw new Error(`pnpm visor terminó antes de tiempo:\n${salida()}`)
-    try {
-      if ((await fetch(url)).ok) return
-    } catch {
-      // Todavía no escucha.
-    }
-    await new Promise((listo) => setTimeout(listo, 300))
-  }
-  throw new Error(`El visor no respondió en ${url}:\n${salida()}`)
-}
-
-function detener(proceso: ChildProcess): void {
-  if (proceso.pid === undefined || proceso.exitCode !== null) return
-  if (process.platform === 'win32') execFileSync('taskkill', ['/pid', String(proceso.pid), '/T', '/F'], { stdio: 'ignore' })
-  else proceso.kill('SIGTERM')
-}
+import { borrarCarpeta, detener, entornoLimpio, esperarServidor } from './procesos'
 
 const plan = {
   $schema: '../plan-vivo/schema/plan.schema.json',
@@ -76,7 +50,8 @@ test('plan fuera de la carpeta del kit: pnpm --dir <kit> visor -- --plan plan.js
     visor.stdout?.on('data', (dato) => (salida += String(dato)))
     visor.stderr?.on('data', (dato) => (salida += String(dato)))
     await esperarServidor(`http://localhost:${PUERTO_KIT}/plan.json`, visor, () => salida)
-    expect(salida).toContain(`Plan: ${ruta}`)
+    // El visor imprime sus planes un instante después de empezar a responder.
+    await expect.poll(() => salida).toContain(`Plan: ${ruta}`)
 
     await page.clock.setFixedTime(AHORA)
     await page.goto(`http://localhost:${PUERTO_KIT}/`)
@@ -97,7 +72,7 @@ test('plan fuera de la carpeta del kit: pnpm --dir <kit> visor -- --plan plan.js
     expect(readFileSync(join(KIT, 'plan-vivo.config.json'), 'utf8')).toBe(configDelKit)
   } finally {
     if (visor) detener(visor)
-    rmSync(proyecto, { recursive: true, force: true, maxRetries: 5, retryDelay: 500 })
+    borrarCarpeta(proyecto)
   }
 })
 
@@ -121,7 +96,25 @@ test('plan que no existe: el visor no arranca y dice qué ruta falta', () => {
       expect(e.status).toBe(1)
     }
     expect(salida).toContain(`No existe el plan: ${join(proyecto, 'no-existe.json')} (indicada con --plan)`)
+
+    // También el segundo de varios --plan.
+    writeFileSync(join(proyecto, 'plan.json'), '{}')
+    let segunda = ''
+    try {
+      execFileSync('pnpm', ['--silent', '--dir', `"${KIT}"`, 'visor', '--', '--plan', 'plan.json', '--plan', 'otro.json', '--puerto', String(PUERTO_KIT)], {
+        cwd: proyecto,
+        env: entornoLimpio(),
+        shell: true,
+        encoding: 'utf8',
+        stdio: 'pipe',
+        timeout: 30_000,
+      })
+    } catch (error) {
+      const e = error as { stdout: string; stderr: string }
+      segunda = `${e.stdout}${e.stderr}`
+    }
+    expect(segunda).toContain(`No existe el plan: ${join(proyecto, 'otro.json')} (indicada con --plan)`)
   } finally {
-    rmSync(proyecto, { recursive: true, force: true, maxRetries: 5, retryDelay: 500 })
+    borrarCarpeta(proyecto)
   }
 })

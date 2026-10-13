@@ -16,6 +16,10 @@ export const IDENTIFICADOR_POR_DEFECTO = '\\b[A-Z]+\\d+\\s*·\\s*([A-Za-z]+\\d+[
 export interface Configuracion {
   // Ruta absoluta de plan.json.
   plan: string
+  // Solo el visor: todos los planes que sirve, empezando por plan (--plan repetido y la lista planes del archivo).
+  planes: string[]
+  // Los de la lista planes del archivo, para los mensajes de error.
+  planesDelArchivo: string[]
   puerto: number
   zonaHoraria: string
   // Repositorio git del proyecto; null: se busca desde la carpeta de plan.json.
@@ -33,13 +37,14 @@ export interface Configuracion {
 
 export type Origen = 'argumento' | 'variable' | 'archivo' | 'defecto'
 
-const CLAVES = ['plan', 'puerto', 'zonaHoraria', 'repo', 'sesiones', 'asignaciones', 'identificador'] as const
+const CLAVES = ['plan', 'planes', 'puerto', 'zonaHoraria', 'repo', 'sesiones', 'asignaciones', 'identificador'] as const
 export type Clave = (typeof CLAVES)[number]
 type Valor = string | number | string[] | null
 type Parcial = Partial<Record<Clave, Valor>>
 
 // Argumentos: --plan, --puerto, --zona, --repo, --sesiones, --asignaciones, --identificador, --config.
-// --sesiones se puede repetir; los demás, una sola vez.
+// --sesiones se puede repetir; --plan, solo en el visor (opción variosPlanes); los demás, una sola vez.
+// planes solo existe en el archivo: la lista de planes que el visor abre al levantarse.
 const ARGUMENTOS: Record<string, Clave | 'config'> = {
   '--plan': 'plan',
   '--puerto': 'puerto',
@@ -52,7 +57,10 @@ const ARGUMENTOS: Record<string, Clave | 'config'> = {
 }
 
 // Nombre del argumento de cada clave, para los mensajes.
-const ARGUMENTO_DE = Object.fromEntries(Object.entries(ARGUMENTOS).map(([nombre, clave]) => [clave, nombre])) as Record<Clave, string>
+const ARGUMENTO_DE = {
+  ...Object.fromEntries(Object.entries(ARGUMENTOS).map(([nombre, clave]) => [clave, nombre])),
+  planes: '--plan',
+} as Record<Clave, string>
 
 const VARIABLES: Record<string, Clave | 'config'> = {
   PLAN_VIVO_PLAN: 'plan',
@@ -72,10 +80,14 @@ export class ErrorDeConfiguracion extends Error {
   }
 }
 
-export function leerArgumentos(args: string[]): { valores: Parcial; config?: string; resto: string[] } {
+export function leerArgumentos(
+  args: string[],
+  { variosPlanes = false }: { variosPlanes?: boolean } = {},
+): { valores: Parcial; config?: string; resto: string[]; masPlanes: string[] } {
   const valores: Parcial = {}
   let config: string | undefined
   const resto: string[] = []
+  const masPlanes: string[] = []
   for (let i = 0; i < args.length; i++) {
     // pnpm <comando> -- <argumentos> deja pasar el "--" tal cual: se ignora.
     if (args[i] === '--') continue
@@ -88,11 +100,12 @@ export function leerArgumentos(args: string[]): { valores: Parcial; config?: str
     const valor = enLinea ?? args[++i]
     if (valor === undefined || valor === '' || valor.startsWith('--')) throw new ErrorDeConfiguracion(`Falta el valor de ${nombre}`)
     if (clave === 'sesiones') valores.sesiones = [...((valores.sesiones as string[] | undefined) ?? []), valor]
+    else if (clave === 'plan' && variosPlanes && valores.plan !== undefined) masPlanes.push(valor)
     else if ((clave === 'config' ? config : valores[clave]) !== undefined) throw new ErrorDeConfiguracion(`${nombre} se indicó más de una vez`)
     else if (clave === 'config') config = valor
     else valores[clave] = valor
   }
-  return { valores, config, resto }
+  return { valores, config, resto, masPlanes }
 }
 
 function leerArchivo(ruta: string): Parcial {
@@ -108,10 +121,14 @@ function leerArchivo(ruta: string): Parcial {
   if (desconocidas.length) throw new ErrorDeConfiguracion(`${ruta}: claves no reconocidas: ${desconocidas.join(', ')}. Válidas: ${CLAVES.join(', ')}`)
   for (const [clave, valor] of Object.entries(objeto)) {
     if (clave === '$comentario') continue
-    // sesiones admite una carpeta o una lista de carpetas.
-    const lista = clave === 'sesiones' && Array.isArray(valor) && valor.length > 0 && valor.every((v) => typeof v === 'string' && v !== '')
+    // sesiones admite una carpeta o una lista de carpetas; planes, solo una lista.
+    const lista = Array.isArray(valor) && valor.length > 0 && valor.every((v) => typeof v === 'string' && v !== '')
     const tipoValido =
-      clave === 'puerto' ? typeof valor === 'number' : lista || typeof valor === 'string' || (valor === null && (clave === 'repo' || clave === 'sesiones'))
+      clave === 'puerto'
+        ? typeof valor === 'number'
+        : clave === 'planes'
+          ? lista
+          : (clave === 'sesiones' && lista) || typeof valor === 'string' || (valor === null && (clave === 'repo' || clave === 'sesiones'))
     if (!tipoValido) throw new ErrorDeConfiguracion(`${ruta}: ${clave} tiene un tipo no válido`)
   }
   return objeto as Parcial
@@ -125,10 +142,10 @@ const vacio = (valor: Valor | undefined): valor is null | undefined | '' => valo
 export function leerConfiguracion(
   args: string[] = [],
   entorno: NodeJS.ProcessEnv = process.env,
-  { cwd = process.cwd(), raiz = RAIZ_KIT }: { cwd?: string; raiz?: string } = {},
+  { cwd = process.cwd(), raiz = RAIZ_KIT, variosPlanes = false }: { cwd?: string; raiz?: string; variosPlanes?: boolean } = {},
 ): Configuracion & { resto: string[] } {
   const base = entorno.INIT_CWD ?? cwd
-  const argumentos = leerArgumentos(args)
+  const argumentos = leerArgumentos(args, { variosPlanes })
   const deEntorno: Parcial = {}
   let configEntorno: string | undefined
   for (const [variable, clave] of Object.entries(VARIABLES)) {
@@ -170,6 +187,10 @@ export function leerConfiguracion(
     : (Array.isArray(valorSesiones) ? valorSesiones : [String(valorSesiones)]).map((carpeta) => absoluta(carpeta, baseSesiones))
 
   const plan = ruta('plan', join(raiz, 'plan.json'))!
+  const planesDelArchivo = ((delArchivo.planes as string[] | undefined) ?? []).map((r) => absoluta(r, baseArchivo))
+  const planes = [plan, ...argumentos.masPlanes.map((r) => absoluta(r, base)), ...planesDelArchivo].filter(
+    (r, i, todos) => todos.findIndex((otra) => otra.toLowerCase() === r.toLowerCase()) === i,
+  )
   const puertoCrudo = elegir('puerto').valor ?? PUERTO_POR_DEFECTO
   const puerto = Number(puertoCrudo)
   if (!Number.isInteger(puerto) || puerto < 1 || puerto > 65535) throw new ErrorDeConfiguracion(`Puerto no válido: ${String(puertoCrudo)}`)
@@ -188,6 +209,8 @@ export function leerConfiguracion(
 
   return {
     plan,
+    planes,
+    planesDelArchivo,
     puerto,
     zonaHoraria,
     repo: ruta('repo', null),
@@ -203,6 +226,7 @@ export function leerConfiguracion(
 
 const DESCRIPCION = {
   plan: 'el plan',
+  planes: 'el plan',
   repo: 'la carpeta del repositorio',
   sesiones: 'la carpeta de sesiones',
   asignaciones: 'el archivo de asignaciones',

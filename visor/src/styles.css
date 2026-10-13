@@ -61,6 +61,42 @@ button {
   padding: 24px 16px 48px;
 }
 
+/* Selector de planes: un solo visor para varios proyectos */
+.plan-selector {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 12px 16px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-size: 0.82rem;
+}
+
+.plan-selector-label {
+  color: var(--muted);
+  margin-right: 4px;
+}
+
+.plan-selector a {
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.plan-selector a:hover {
+  border-color: var(--focus);
+}
+
+.plan-selector a[aria-current='page'] {
+  background: var(--text);
+  border-color: var(--text);
+  color: #fff;
+}
+
 /* Encabezado */
 .top {
   display: flex;

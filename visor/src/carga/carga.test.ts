@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
-import { interpretar } from './Cargador'
+import { elegirPlan, enlace, interpretar } from './Cargador'
 
 const ejemplo = readFileSync(new URL('../../../ejemplos/plan.json', import.meta.url), 'utf8')
 
@@ -29,5 +29,24 @@ describe('carga de plan.json desde el servidor del visor', () => {
 
   it('otra respuesta del servidor: sin servidor', () => {
     expect(interpretar(500, 'error')).toEqual({ estado: 'sin_servidor' })
+  })
+})
+
+describe('varios planes en un visor', () => {
+  const planes = [
+    { id: 'server-monitor', ruta: 'C:/a/server-monitor/plan.json' },
+    { id: 'plan-vivo', ruta: 'C:/a/plan-vivo/plan.json' },
+  ]
+
+  it('sin ?plan= se ve el primero; con ?plan=<id>, ese; con un id que no está, ninguno', () => {
+    expect(elegirPlan(planes, null)?.id).toBe('server-monitor')
+    expect(elegirPlan(planes, 'plan-vivo')?.id).toBe('plan-vivo')
+    expect(elegirPlan(planes, 'otro')).toBeUndefined()
+    expect(elegirPlan([], null)).toBeUndefined()
+  })
+
+  it('el enlace del primero es la raíz; el de los demás lleva su id', () => {
+    expect(enlace(planes, planes[0])).toBe('/')
+    expect(enlace(planes, planes[1])).toBe('/?plan=plan-vivo')
   })
 })

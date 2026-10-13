@@ -119,5 +119,10 @@
     "networkTitle": "No se pudo leer plan.json",
     "network": "El servidor del visor no respondió. Revisa que pnpm visor siga en marcha.",
     "retry": "El visor vuelve a intentarlo cuando el archivo cambia."
+  },
+  "plans": {
+    "label": "Planes",
+    "unknownTitle": "No encontré ese plan",
+    "unknown": "Este visor no tiene ningún plan «{id}». Elige uno de la lista, o súmalo con pnpm visor --plan <ruta>."
   }
 }

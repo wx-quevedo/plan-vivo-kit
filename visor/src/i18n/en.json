@@ -119,5 +119,10 @@
     "networkTitle": "Could not read plan.json",
     "network": "The viewer server did not respond. Check that pnpm visor is still running.",
     "retry": "The viewer tries again when the file changes."
+  },
+  "plans": {
+    "label": "Plans",
+    "unknownTitle": "Plan not found",
+    "unknown": "This viewer has no plan \"{id}\". Pick one from the list, or add it with pnpm visor --plan <path>."
   }
 }

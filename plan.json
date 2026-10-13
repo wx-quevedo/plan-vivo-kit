@@ -3,7 +3,7 @@
   "schema_version": 1,
   "project": "plan-vivo",
   "title": "Plan vivo (kit)",
-  "updated_at": "2026-10-12T10:35:00-05:00",
+  "updated_at": "2026-10-12T21:47:00-05:00",
   "phases": [
     {
       "id": "F0",
@@ -87,6 +87,19 @@
           ],
           "files_changed": 32,
           "notes": "Imprevisto dentro de P2: al leer también la carpeta de sesiones de Monitor, su mensaje «F1 · P2:» del 11 oct chocaba con el P2 del kit; se agregó null en asignaciones.mensajes. El primer mensaje de esta sesión empieza con un bloque pegado, sin identificador: va a P2 por asignaciones.json. Falta que Washington confirme los detalles del incidente de la carpeta borrada."
+        },
+        {
+          "id": "P3",
+          "type": "prompt",
+          "title": "Un solo visor para varios planes",
+          "status": "in_progress",
+          "estimate_min": [60, 100],
+          "difficulty": 6,
+          "work_log": [],
+          "summary": "",
+          "steps": [],
+          "files_changed": 0,
+          "notes": ""
         }
       ]
     }

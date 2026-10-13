@@ -30,6 +30,12 @@ describe('identificador de item', () => {
     expect([...p.porItem.keys()]).toEqual(['P6b', 'T3'])
   })
 
+  it('la fase también puede llevar una letra final: "M6b · P2:"', () => {
+    const p = proponerCon([humano('10:00', 'M6b · P2: algo'), agente('10:10'), humano('11:00', 'M6b: sin item'), agente('11:05')], ['P2'])
+    expect([...p.porItem.keys()]).toEqual(['P2'])
+    expect(p.porItem.get('P2')).toHaveLength(2)
+  })
+
   it('un "Nota:" o una hora "10:30" al inicio no abren ningún item', () => {
     const p = proponerCon([humano('10:00', 'F1 · P1: algo'), agente('10:10'), humano('10:20', 'Nota: a las 10:30 reviso'), agente('10:25')], ['P1'])
     expect(p.sinAsignar).toEqual([])

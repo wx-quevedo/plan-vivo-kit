@@ -10,8 +10,9 @@ export const RAIZ_KIT = dirname(fileURLToPath(import.meta.url))
 export const ARCHIVO_CONFIG = 'plan-vivo.config.json'
 export const PUERTO_POR_DEFECTO = 5190
 export const ZONA_POR_DEFECTO = 'America/Guayaquil'
-// "F1 · P4:" abre el item P4. El primer grupo de captura es el id del item.
-export const IDENTIFICADOR_POR_DEFECTO = '\\b[A-Z]+\\d+\\s*·\\s*([A-Za-z]+\\d+[a-z]?)\\s*:'
+// "F1 · P4:" abre el item P4. El primer grupo de captura es el id del item. La fase también admite una letra final
+// ("M6b · P2:"), como los ids de item.
+export const IDENTIFICADOR_POR_DEFECTO = '\\b[A-Z]+\\d+[a-z]?\\s*·\\s*([A-Za-z]+\\d+[a-z]?)\\s*:'
 
 export interface Configuracion {
   // Ruta absoluta de plan.json.

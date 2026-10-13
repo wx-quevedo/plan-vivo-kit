@@ -168,7 +168,7 @@ Si no se indica la carpeta de sesiones, se busca en `~/.claude/projects/` la que
 **Cómo asigna cada mensaje de la persona a un item:**
 
 1. Si `asignaciones.json` tiene una entrada para ese mensaje, manda esa entrada.
-2. Si el mensaje empieza con un identificador, por ejemplo «F2 · P4: …», abre ese item. El identificador se reconoce con la opción `identificador`, y el id debe existir en `plan.json`.
+2. Si el mensaje empieza con un identificador, por ejemplo «F2 · P4: …», abre ese item. La forma es `<fase> · <item>:`: la fase es letras, número y una letra opcional (F2, M6b); el item, igual (P4, P6b). Un id solo, sin fase («M6b:»), no se reconoce. El identificador se reconoce con la opción `identificador`, y el id debe existir en `plan.json`.
 3. Si no hay ninguna de las dos cosas, el mensaje pertenece al item que esté abierto.
 
 Para que esto funcione, cada prompt nuevo debe empezar con su identificador. Los bloques que el entorno agrega delante del mensaje no cuentan: el script salta `<browser_instruction>`, `<system-reminder>`, `<ide_selection>`, `<ide_opened_file>` e `<ide_diagnostics>` completos, y de `<pasted_content>` solo la etiqueta, así que un prompt pegado que empieza con «F1 · P2:» se reconoce. Si un prompt llega sin identificador, o con otro formato, agrega la excepción.

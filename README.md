@@ -132,7 +132,7 @@ Cada opción se puede dar como argumento, como variable de entorno o en `plan-vi
 | `--repo` | `repo` | `PLAN_VIVO_REPO` | la raíz git de la carpeta del plan | Repositorio del que tiempos lee los commits. |
 | `--sesiones` | `sesiones` | `PLAN_VIVO_SESIONES` | `~/.claude/projects/<ruta del repo>` | Carpeta de las sesiones de Claude Code. Se puede repetir; en el archivo, una lista; en la variable, separadas por `;` (Windows) o `:`. |
 | `--asignaciones` | `asignaciones` | `PLAN_VIVO_ASIGNACIONES` | `asignaciones.json` junto al plan | Excepciones de tiempos. Por defecto es opcional; si la indicas, debe existir. |
-| `--identificador` | `identificador` | `PLAN_VIVO_IDENTIFICADOR` | `\b[A-Z]+\d+\s*·\s*([A-Za-z]+\d+[a-z]?)\s*:` | Expresión que reconoce el item al inicio de un mensaje («F1 · P4:»). |
+| `--identificador` | `identificador` | `PLAN_VIVO_IDENTIFICADOR` | `\b[A-Z]+\d+[a-z]?\s*·\s*([A-Za-z]+\d+[a-z]?)\s*:` | Expresión que reconoce el item al inicio de un mensaje («F1 · P4:», «M6b · P2:»). |
 | `--config` | | `PLAN_VIVO_CONFIG` | `plan-vivo.config.json` del kit | Otro archivo de configuración. |
 
 ## Versión del formato

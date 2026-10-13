@@ -20,6 +20,6 @@ El plan del proyecto vive en `plan.json`, en la raíz. Se mantiene con el kit pl
   - `pnpm --dir C:\xampp\htdocs\plan-vivo migrar -- --plan C:\xampp\htdocs\<proyecto>\plan.json` si validar avisa que falta `schema_version` o el kit cambió de versión: revisa los cambios y aplica con `--aplicar`.
 - El `work_log` no se escribe a mano. Las excepciones van en `asignaciones.json`, junto a `plan.json`, nunca en el `work_log`.
 - Cuando necesites que la persona haga algo (un comando, una confirmación, una decisión), pídelo con AskUserQuestion: es la señal de espera que reconoce el script.
-- Visor: `pnpm --dir C:\xampp\htdocs\plan-vivo visor -- --plan C:\xampp\htdocs\<proyecto>\plan.json` (http://localhost:5190). Si la persona ya lo tiene abierto, no lo detengas ni levantes otro en ese puerto.
+- Visor: `pnpm --dir C:\xampp\htdocs\plan-vivo visor -- --plan C:\xampp\htdocs\<proyecto>\plan.json` (http://localhost:5190). Un solo visor sirve todos los proyectos: si ya está abierto, el comando le suma este plan y muestra su dirección. No lo detengas ni levantes otro en otro puerto.
 - Fallos o mejoras del kit: no los arregles aquí ni copies el kit a este proyecto. Anótalos en `C:\xampp\htdocs\plan-vivo\PENDIENTES.md`, con el formato fijo del archivo (fecha, proyecto de origen, qué pasa, cómo reproducirlo, prioridad), avisa en una línea y sigue con tu trabajo.
 ```

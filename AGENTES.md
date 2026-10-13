@@ -237,7 +237,7 @@ pnpm --dir C:\xampp\htdocs\plan-vivo visor -- --plan C:\xampp\htdocs\<proyecto>\
 - Si una ruta no existe, el comando termina con un mensaje que dice cuál falta y de dónde salió. No sigas: corrige la ruta.
 - **validar** sale con código 1 si el plan no cumple el esquema, y avisa (sin fallar) si falta `schema_version`.
 - **migrar** sin `--aplicar` solo muestra los cambios. Revísalos y aplica con `--aplicar`: escribe el plan, después de validar, y deja `plan.json.bak` con el original. Haz el commit del plan migrado; el `.bak` no se versiona. Migrar dos veces no cambia nada.
-- **visor:** puerto 5190 por defecto. Si la persona ya lo tiene abierto, no lo detengas ni levantes otro en ese puerto; si necesitas uno propio, usa `--puerto 5192`.
+- **visor:** un solo visor, en 5190, sirve los planes de todos los proyectos. Si ya está abierto, el mismo comando le suma tu plan y te da su dirección (`http://localhost:5190/?plan=<carpeta del proyecto>`), sin levantar otro servidor; pásale esa dirección a la persona. No detengas el visor ni levantes otro en otro puerto.
 
 No copies el kit al proyecto ni crees un `plan-vivo.config.json` en el proyecto: el plan se indica siempre con `--plan`.
 

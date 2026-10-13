@@ -20,6 +20,7 @@ Este repositorio es el kit plan vivo: esquema de `plan.json`, visor, script de t
 - El plan propio del kit es `plan.json` (con `asignaciones.json`), y se mantiene como dice `AGENTES.md`. No viajan en el zip.
 - Lo que reporten agentes de otros proyectos llega a `PENDIENTES.md` (decisión K4). Revísalo al empezar cada prompt.
 - Un cambio que altere el formato de `plan.json` sube `VERSION_ESQUEMA` y trae su migración en `visor/src/plan/migraciones.ts` (decisión K3).
+- La skill «plan vivo» la guarda Washington en claude.ai y no se actualiza sola. Si un cambio toca algo que ella dice (ruta del kit, nombre o argumentos de un comando, puertos, cuándo usarla, la regla de PENDIENTES.md), avísalo al cerrar con el texto exacto para pegar. Lo demás va en `AGENTES.md`, que los agentes leen en cada uso.
 
 ## Puertos
 
@@ -27,9 +28,9 @@ Solo 5190 a 5192:
 
 | Puerto | Uso |
 |---|---|
-| 5190 | Visor (`pnpm visor`). Si Washington lo tiene abierto, no lo detengas ni levantes otro ahí. |
+| 5190 | Visor (`pnpm visor`), uno solo para todos los planes. Si Washington lo tiene abierto, no lo detengas: `pnpm visor --plan <ruta>` le suma el plan. |
 | 5191 | Visor de las pruebas e2e. |
-| 5192 | Visor de la prueba e2e desde otro proyecto, y verificaciones puntuales. |
+| 5192 | Visor de las pruebas e2e desde otro proyecto y con varios planes, y verificaciones puntuales. |
 
 ## Subagentes
 

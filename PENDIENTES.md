@@ -44,6 +44,12 @@ Prioridad: **alta** si da datos falsos o impide usar el kit; **media** si molest
 - **Qué pasa:** el cierre de un prompt corre `tiempos --aplicar` antes del commit final y del mensaje de cierre. En la corrida siguiente, ese trabajo posterior alarga el último tramo del item ya cerrado y le suma el commit final, que según las reglas de los proyectos no debería contarse como evidencia. Pasó con G2 (+31 s, commit bdc768a) y con P9 (+92 s, commit 156552f). Cada prompt nuevo encuentra entonces un item cerrado «distinto», y la regla «los cerrados no deben cambiar» deja de servir como control. Mejoras posibles: que `--aplicar` registre en el plan hasta dónde se cargó cada item y no lo extienda después, o que la tabla marque aparte el cambio que es solo la cola del cierre.
 - **Cómo reproducirlo:** cerrar un item con `tiempos --aplicar`, hacer el commit final y escribir el mensaje de cierre. En el prompt siguiente, `tiempos` sin `--aplicar` muestra ese item como «distinto», con el fin más tarde y el commit final.
 - **Prioridad:** baja.
+### 2026-10-12 · Leer la carpeta de sesiones de otro proyecto mezcla sus identificadores
+
+- **Proyecto de origen:** plan-vivo (`C:\xampp\htdocs\plan-vivo`), F1 · P2 y P3.
+- **Qué pasa:** con `--sesiones` repetido se puede sumar la carpeta de otro proyecto (el kit lo necesitó porque F0 quedó en la de Monitor). Pero todos los mensajes de esa carpeta entran: los que traen un id que también existe en este plan («F1 · P2:», «F1 · P3:» de Monitor) abren ese item, y los que siguen sin identificador caen en él. Hoy se rodea con `null` en `asignaciones.mensajes`, mensaje por mensaje, o dejando de leer esa carpeta.
+- **Cómo reproducirlo:** en el kit, `pnpm tiempos --plan plan.json --sesiones <carpeta de Monitor> --sesiones <carpeta del kit>`: el P3 del kit recibe decenas de tramos del 11 oct.
+- **Prioridad:** baja. Mejora posible: acotar cada carpeta por fechas (por ejemplo `--sesiones <carpeta>@<desde>..<hasta>`), o leer de una carpeta ajena solo los mensajes que asigna `asignaciones.json`.
 
 ## Resueltos
 

@@ -33,6 +33,12 @@ Aprobadas por Washington el 2026-10-12.
 - **K7** En `asignaciones.json`, `null` como valor de un mensaje lo excluye: no abre ningún item y cierra el que estaba abierto. Propuesta por esta sesión en F1 · P2 y aprobada por Washington el 2026-10-12.
   - **Por qué:** con `--sesiones` repetido se puede leer la carpeta de sesiones de otro proyecto (las de F0 quedaron en la de Monitor). Sus mensajes traen identificadores propios que pueden existir también en este plan, como su «F1 · P2:», y sin forma de excluirlos el script les asignaba tramos falsos.
 
+- **K8** Un solo visor, en 5190, sirve los planes de todos los proyectos. Cada plan tiene su dirección (`?plan=<carpeta del proyecto>`) y se recarga por separado. Si el visor ya está abierto, `pnpm visor --plan <ruta>` le suma el plan y termina, sin levantar otro servidor. Al levantarlo, `--plan` se puede repetir y `plan-vivo.config.json` acepta una lista `planes`. Propuesta por esta sesión y aprobada por Washington el 2026-10-12 (F1 · P3).
+  - **Por qué:** con un visor por plan, cada proyecto necesitaba su propio puerto, y solo 5190 queda libre para uso diario (5191 y 5192 son de las pruebas). Así los agentes solo suman su plan y Washington deja un único visor abierto.
+  - **Skill:** no cambia. El comando que da la skill (`pnpm --dir … visor -- --plan <proyecto>`, en 5190) sigue valiendo: ahora, con el visor abierto, suma el plan en lugar de fallar.
+  - **Seguridad:** sigue solo en localhost. Para sumar un plan se exige la cabecera `X-Plan-Vivo: 1` (una página de otro origen no puede mandarla sin una consulta previa de CORS que el servidor no aprueba) y una ruta absoluta a un `.json` que exista.
+  - **Límite:** la lista vive en memoria; al cerrar el visor se pierden los planes sumados después. Para abrir siempre los mismos, la lista `planes` del archivo.
+
 ## 3. Bitácora
 
 - 2026-10-12 — **F0 · P1, kit inicial** (commits f398153, b9aef66 y 5b486ce). El agente de server-monitor exportó el plan vivo como kit en un repositorio nuevo:
@@ -59,6 +65,14 @@ Aprobadas por Washington el 2026-10-12.
   - `npx autoskills --dry-run`: detectó TypeScript, Node.js, React, Zod, Playwright, Vite y Vitest, y propuso 12 skills. No se instaló nada.
 - 2026-10-12 — Washington aprobó K6 y K7 y completó los datos del incidente. Skills instaladas con `npx autoskills -a claude-code`: las 12 del dry-run (accessibility, seo, vite, vitest, frontend-design, playwright-best-practices, zod, nodejs-best-practices, react-best-practices, composition-patterns, typescript-advanced-types y nodejs-backend-patterns).
   - Quedan en `.agents/skills/`, con enlaces en `.claude/skills/` y su `skills-lock.json`. Por indicación de Washington, ningún archivo de skill va al repositorio: las tres rutas están en `.gitignore` y no viajan en el zip.
+- 2026-10-12 — **F1 · P3, un solo visor para varios planes** (K8).
+  - `visor/servidor/planes.ts` (ids y registro de planes) y `visor/servidor/plugin.ts` (`/plan.json?plan=<id>`, `GET` y `POST /__plan-vivo/planes`, un vigilante por plan). `vite.config.ts` queda solo con lo fijo: el puerto, la zona y el plugin los pone `bin/visor.ts`.
+  - `bin/visor.ts` detecta un visor abierto en el puerto y le suma los planes. `--plan` repetible solo en el visor; lista `planes` en `plan-vivo.config.json`.
+  - Selector de planes en el visor (ES y EN), una dirección por plan y aviso de plan desconocido.
+  - CLAUDE.md: regla de avisar con el texto exacto cuando un cambio toque algo de lo que dice la skill.
+  - README, AGENTES (sección 8) y snippet: un solo visor; no levantar otro en otro puerto.
+  - Pruebas: 59 de tiempos, 94 del visor y 11 e2e, en verde dos veces seguidas. 20 mutaciones de las funciones nuevas en rojo por aserción y en verde al restaurar.
+  - Verificación real en 5190: visor con el plan del kit y, con un segundo comando desde la carpeta de Monitor, su plan sumado (`?plan=server-monitor`), solo lectura.
 
 ## 4. Problemas y resoluciones
 
@@ -72,6 +86,8 @@ Aprobadas por Washington el 2026-10-12.
 - 2026-10-12 — Al cargar los tramos de P2 leyendo las dos carpetas de sesiones (la de Monitor, donde quedó F0, y la del kit), el mensaje «F1 · P2:» de Monitor del 11 oct abría el P2 del kit, y decenas de mensajes de Monitor sin identificador caían en él. Resolución: `null` en `asignaciones.mensajes` excluye el mensaje y cierra el item abierto; el kit lo usa para ese mensaje.
 - 2026-10-12 — El primer mensaje de esta sesión empieza con un bloque pegado, no con «F1 · P2:», y tiempos lo asignaba a P1. Resolución: entrada en `asignaciones.json`. Para los próximos encargos, conviene que el identificador vaya en la primera línea, antes del bloque pegado.
 - 2026-10-12 — Al probar desde bash, un `--plan C:\xampp\...` sin comillas perdió las barras antes de llegar a pnpm. No es del kit (el mensaje de ruta inexistente lo mostró bien); desde PowerShell funciona tal cual.
+- 2026-10-12 — Al cargar los tramos de P3 leyendo también la carpeta de sesiones de Monitor, su mensaje «F1 · P3:» del 11 oct abría el P3 del kit, igual que antes con P2. Cada id nuevo del kit (P4 a P8) volvería a chocar. Resolución: los tramos del kit se cargan solo con la carpeta de sesiones del kit (`c--xampp-htdocs-plan-vivo`). P1, el único item con sesiones en la carpeta de Monitor, queda sin propuesta y `--aplicar` no lo toca. Anotado en PENDIENTES.md: acotar por fechas la lectura de una carpeta de sesiones.
+- 2026-10-12 — Una prueba e2e del visor esperaba los mensajes de la consola en cuanto el servidor respondía, pero el visor los imprime un instante después; pasaba por suerte. La mutación V1 lo dejó ver. Resolución: `expect.poll` sobre la salida. Además, en Windows `rmSync` de la carpeta temporal daba EPERM en el `finally` y tapaba el error real de la prueba; la limpieza ahora ignora ese fallo.
 
 ## 5. Próximos pasos
 

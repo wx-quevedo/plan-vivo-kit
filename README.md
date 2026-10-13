@@ -72,7 +72,7 @@ Para ver el ejemplo: `pnpm visor` y entra a http://localhost:5190. La configurac
 
 1. Pega el bloque de `snippet-claude.md` en el `CLAUDE.md` del proyecto.
 2. El agente crea `plan.json` en la raíz del proyecto siguiendo `AGENTES.md`. Si prefieres empezar tú, copia `ejemplos/plan-inicial.json` a la raíz del proyecto como `plan.json`.
-3. Abre el visor apuntando a ese plan (siguiente sección).
+3. Abre el visor apuntando a ese plan (siguiente sección). Si ya está abierto con otro proyecto, el mismo comando le suma este plan.
 
 No hace falta instalar nada en el proyecto ni tocar la configuración del kit.
 
@@ -95,9 +95,19 @@ pnpm --dir C:\xampp\htdocs\plan-vivo visor -- --plan C:\xampp\htdocs\mi-proyecto
 
 Con `pnpm --dir`, una ruta relativa se resuelve desde la carpeta donde se llamó: dentro del proyecto, `--plan plan.json` también funciona. En PowerShell el `--` es opcional.
 
+### Un solo visor para todos los proyectos
+
+Un visor en 5190 sirve los planes de varios proyectos a la vez:
+
+- **Sumar un plan:** si el visor ya está abierto, `pnpm visor --plan <ruta>` no levanta otro servidor: le suma el plan, muestra su dirección y termina. Si el plan ya estaba, solo muestra la dirección.
+- **Una dirección por plan:** el primero en http://localhost:5190, los demás en http://localhost:5190/?plan=<id>. El id es el nombre de la carpeta del proyecto (`C:\xampp\htdocs\server-monitor\plan.json` queda como `server-monitor`). Cada uno se puede tener en su pestaña.
+- **Selector:** con más de un plan, arriba aparece la lista; las pestañas abiertas ven los planes nuevos sin recargar.
+- **Recarga:** cada plan se recarga solo cuando se guarda ese archivo.
+- **Al levantarlo:** `--plan` se puede repetir, y `plan-vivo.config.json` acepta una lista `planes` para abrir siempre los mismos. La lista vive en memoria: al cerrar el visor se pierden los planes sumados después.
+
 | Comando | Qué hace |
 |---|---|
-| `pnpm visor` | Levanta el visor en el puerto configurado (5190 por defecto). Acepta `--plan`, `--puerto`, `--zona` y `--config`. |
+| `pnpm visor` | Levanta el visor en el puerto configurado (5190 por defecto), o suma el plan al visor que ya está abierto ahí. Acepta `--plan` (repetible), `--puerto`, `--zona` y `--config`. |
 | `pnpm validar` | Valida el plan con el mismo esquema que el visor y lista los problemas con su ubicación. Avisa si falta `schema_version`. |
 | `pnpm tiempos` | Propone el `work_log` de cada item a partir de las sesiones de Claude Code y de git. Solo muestra diferencias; con `--aplicar` escribe el plan. Ver `AGENTES.md`. |
 | `pnpm migrar` | Lleva el plan a la versión actual del formato. Solo muestra los cambios; con `--aplicar` los escribe y deja una copia `.bak`. |
@@ -116,6 +126,7 @@ Cada opción se puede dar como argumento, como variable de entorno o en `plan-vi
 | Argumento | Clave del archivo | Variable | Por defecto | Para qué |
 |---|---|---|---|---|
 | `--plan` | `plan` | `PLAN_VIVO_PLAN` | `plan.json` del kit | Ruta del plan. |
+| | `planes` | | ninguna | Solo el visor: lista de planes que abre además de `plan`, con rutas relativas a la carpeta del archivo. |
 | `--puerto` | `puerto` | `PLAN_VIVO_PUERTO` | `5190` | Puerto del visor (solo `localhost`). |
 | `--zona` | `zonaHoraria` | `PLAN_VIVO_ZONA` | `America/Guayaquil` | Zona IANA para mostrar las horas y para escribir los tramos. |
 | `--repo` | `repo` | `PLAN_VIVO_REPO` | la raíz git de la carpeta del plan | Repositorio del que tiempos lee los commits. |
@@ -145,9 +156,9 @@ Si trabajando en otro proyecto aparece un fallo o una mejora del kit, no se arre
 |---|---|
 | 5190 | Visor (`pnpm visor`), por defecto. |
 | 5191 | Visor de las pruebas e2e, con una copia del ejemplo. |
-| 5192 | Visor de la prueba e2e desde otro proyecto. |
+| 5192 | Visor de las pruebas e2e desde otro proyecto y con varios planes. |
 
-Si 5190 está ocupado, el visor no elige otro: avisa y termina. Usa `--puerto`. Para ver dos planes a la vez, abre el segundo con `--puerto 5192`.
+No hace falta un puerto por proyecto: un solo visor sirve todos los planes. Si 5190 está ocupado por otro programa (no por un visor), el visor no elige otro puerto: avisa y termina. Usa `--puerto`.
 
 ## Contenido
 

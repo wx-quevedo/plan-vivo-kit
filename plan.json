@@ -3,7 +3,7 @@
   "schema_version": 1,
   "project": "plan-vivo",
   "title": "Plan vivo (kit)",
-  "updated_at": "2026-10-12T21:47:00-05:00",
+  "updated_at": "2026-10-12T22:10:00-05:00",
   "phases": [
     {
       "id": "F0",
@@ -62,15 +62,29 @@
             {
               "actor": "coding_agent",
               "start": "2026-10-12T09:53:55-05:00",
-              "end": "2026-10-12T10:31:45-05:00",
+              "end": "2026-10-12T10:33:03-05:00",
               "note": "",
-              "commits": ["0a68d0b", "7f9b717", "e941c66", "9629a72", "30bac41"]
+              "commits": ["0a68d0b", "7f9b717", "e941c66", "9629a72", "30bac41", "b44c67a"]
             },
             {
               "actor": "subagent",
               "start": "2026-10-12T10:07:35-05:00",
               "end": "2026-10-12T10:25:23-05:00",
               "note": "subagente a31fe521",
+              "commits": []
+            },
+            {
+              "actor": "coding_agent",
+              "start": "2026-10-12T12:08:50-05:00",
+              "end": "2026-10-12T12:10:18-05:00",
+              "note": "",
+              "commits": ["03a332d"]
+            },
+            {
+              "actor": "coding_agent",
+              "start": "2026-10-12T21:34:43-05:00",
+              "end": "2026-10-12T21:35:06-05:00",
+              "note": "",
               "commits": []
             }
           ],
@@ -92,14 +106,37 @@
           "id": "P3",
           "type": "prompt",
           "title": "Un solo visor para varios planes",
-          "status": "in_progress",
+          "status": "done",
           "estimate_min": [60, 100],
           "difficulty": 6,
-          "work_log": [],
-          "summary": "",
-          "steps": [],
-          "files_changed": 0,
-          "notes": ""
+          "work_log": [
+            {
+              "actor": "coding_agent",
+              "start": "2026-10-12T21:43:19-05:00",
+              "end": "2026-10-12T21:43:30-05:00",
+              "note": "",
+              "commits": []
+            },
+            {
+              "actor": "coding_agent",
+              "start": "2026-10-12T21:46:04-05:00",
+              "end": "2026-10-12T22:05:18-05:00",
+              "note": "",
+              "commits": ["c98ce70", "893525a", "94ecad2"]
+            }
+          ],
+          "summary": "Un solo visor en 5190 sirve los planes de todos los proyectos: selector, una dirección por plan y pnpm visor --plan con el visor abierto suma el plan sin levantar otro.",
+          "steps": [
+            "visor/servidor: registro de planes con ids por carpeta y plugin con /plan.json?plan=<id>, GET y POST /__plan-vivo/planes",
+            "bin/visor.ts detecta un visor abierto y le suma los planes; --plan repetible y lista planes en plan-vivo.config.json",
+            "Selector de planes (ES y EN), recarga por plan y aviso de plan desconocido",
+            "POST protegido con la cabecera X-Plan-Vivo y ruta absoluta a un .json que exista",
+            "Pruebas: 59 de tiempos, 94 del visor, 11 e2e; 20 mutaciones en rojo por aserción",
+            "Verificado en 5190 con el plan del kit y el de Monitor sumado desde su carpeta",
+            "README, AGENTES, snippet, CLAUDE.md (aviso de cambios que tocan la skill) y PROJECT.md (K8)"
+          ],
+          "files_changed": 26,
+          "notes": "La skill no cambia: su comando del visor sigue valiendo y ahora suma el plan si el visor está abierto. Imprevistos: una carrera en dos e2e (salida del visor) y la limpieza de carpetas temporales en Windows; y, al cargar tiempos, el «F1 · P3:» de Monitor chocaba con este P3, así que el kit ya no lee la carpeta de sesiones de Monitor (pendiente anotado). Los tramos cargados terminan antes del commit de cierre."
         }
       ]
     }

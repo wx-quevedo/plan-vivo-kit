@@ -146,7 +146,7 @@ Construye el `work_log` de cada item a partir de dos fuentes:
 - los registros JSONL de las sesiones de Claude Code;
 - `git log`.
 
-Privacidad: de cada registro usa solo la marca de tiempo, el tipo de evento y la primera línea de los mensajes de la persona. Nada más se copia ni se imprime.
+Privacidad: de cada registro usa solo la marca de tiempo, el tipo de evento y la primera línea con contenido de los mensajes de la persona. Nada más se copia ni se imprime.
 
 ```
 pnpm tiempos --plan <ruta>             muestra la tabla de diferencias; no escribe nada
@@ -171,7 +171,7 @@ Si no se indica la carpeta de sesiones, se busca en `~/.claude/projects/` la que
 2. Si el mensaje empieza con un identificador, por ejemplo «F2 · P4: …», abre ese item. El identificador se reconoce con la opción `identificador`, y el id debe existir en `plan.json`.
 3. Si no hay ninguna de las dos cosas, el mensaje pertenece al item que esté abierto.
 
-Para que esto funcione, cada prompt nuevo debe empezar con su identificador. Si un prompt llega sin él, o con otro formato, agrega la excepción.
+Para que esto funcione, cada prompt nuevo debe empezar con su identificador. Los bloques que el entorno agrega delante del mensaje no cuentan: el script salta `<browser_instruction>`, `<system-reminder>`, `<ide_selection>`, `<ide_opened_file>` e `<ide_diagnostics>` completos, y de `<pasted_content>` solo la etiqueta, así que un prompt pegado que empieza con «F1 · P2:» se reconoce. Si un prompt llega sin identificador, o con otro formato, agrega la excepción.
 
 **Qué muestra la tabla:** cada tramo con uno de estos estados:
 

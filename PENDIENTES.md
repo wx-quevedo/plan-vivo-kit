@@ -24,13 +24,6 @@ Prioridad: **alta** si da datos falsos o impide usar el kit; **media** si molest
 - **Cómo reproducirlo:** un plan con `zonaHoraria` `America/New_York` (o `--zona America/New_York`) y tramos entre el 2026-10-31 y el 2026-11-02, que cruzan el cambio del 1 de noviembre. Abrir el visor y comparar las marcas del eje posteriores al cambio con las horas de los tramos en la consola.
 - **Prioridad:** media.
 
-### 2026-10-12 · El identificador del prompt no se reconoce si el entorno antepone un bloque al mensaje
-
-- **Proyecto de origen:** lanzamiento-remitex (`C:\xampp\htdocs\lanzamiento-remitex`), F1 · P1.
-- **Qué pasa:** la extensión de VS Code con Claude in Chrome guarda el mensaje de la persona con un bloque `<browser_instruction>...</browser_instruction>` delante del texto. `tiempos` toma la primera línea, que es ese bloque, y no ve "F1 · P1:", así que el mensaje queda "sin asignar (sin identificador y sin item abierto)". Se resolvió en el proyecto con una entrada en `asignaciones.json`. Mejora posible: antes de buscar el identificador, saltar bloques de etiquetas del entorno (`<browser_instruction>`, `<system-reminder>`, `<ide_selection>` y similares) y líneas vacías.
-- **Cómo reproducirlo:** en una sesión de la extensión de VS Code con Claude in Chrome activo, enviar un prompt que empiece con "F1 · P1: ..." y correr `pnpm tiempos -- --plan <plan>`: aparece en "Sin asignar" con el texto `"<browser_instruction># Claude in Chrome browser au"`.
-- **Prioridad:** media.
-
 ### 2026-10-12 · Al abrir una fase con su primer item, se pierde el estimado del resto de la fase
 
 - **Proyecto de origen:** server-monitor (`C:\xampp\htdocs\server-monitor`), F3 · P9.
@@ -53,4 +46,11 @@ Prioridad: **alta** si da datos falsos o impide usar el kit; **media** si molest
 
 ## Resueltos
 
-(ninguno todavía)
+### 2026-10-12 · El identificador del prompt no se reconoce si el entorno antepone un bloque al mensaje
+
+- **Proyecto de origen:** lanzamiento-remitex (`C:\xampp\htdocs\lanzamiento-remitex`), F1 · P1.
+- **Qué pasa:** la extensión de VS Code con Claude in Chrome guarda el mensaje de la persona con un bloque `<browser_instruction>...</browser_instruction>` delante del texto. `tiempos` toma la primera línea, que es ese bloque, y no ve "F1 · P1:", así que el mensaje queda "sin asignar (sin identificador y sin item abierto)". Se resolvió en el proyecto con una entrada en `asignaciones.json`. Mejora posible: antes de buscar el identificador, saltar bloques de etiquetas del entorno (`<browser_instruction>`, `<system-reminder>`, `<ide_selection>` y similares) y líneas vacías.
+- **Cómo reproducirlo:** en una sesión de la extensión de VS Code con Claude in Chrome activo, enviar un prompt que empiece con "F1 · P1: ..." y correr `pnpm tiempos -- --plan <plan>`: aparece en "Sin asignar" con el texto `"<browser_instruction># Claude in Chrome browser au"`.
+- **Prioridad:** media.
+- **Resuelto:** 2026-10-12 en el kit, F1 · P4 (commit 124c4df). tiempos salta los bloques del entorno y quita la etiqueta de `<pasted_content>`. La entrada de `asignaciones.json` de lanzamiento-remitex ya no hace falta, pero no estorba.
+

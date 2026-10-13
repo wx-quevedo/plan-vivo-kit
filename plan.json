@@ -3,7 +3,7 @@
   "schema_version": 1,
   "project": "plan-vivo",
   "title": "Plan vivo (kit)",
-  "updated_at": "2026-10-12T22:20:00-05:00",
+  "updated_at": "2026-10-12T22:17:00-05:00",
   "phases": [
     {
       "id": "F0",
@@ -120,9 +120,9 @@
             {
               "actor": "coding_agent",
               "start": "2026-10-12T21:46:04-05:00",
-              "end": "2026-10-12T22:05:18-05:00",
+              "end": "2026-10-12T22:05:41-05:00",
               "note": "",
-              "commits": ["c98ce70", "893525a", "94ecad2"]
+              "commits": ["c98ce70", "893525a", "94ecad2", "afe9c03"]
             }
           ],
           "summary": "Un solo visor en 5190 sirve los planes de todos los proyectos: selector, una dirección por plan y pnpm visor --plan con el visor abierto suma el plan sin levantar otro.",
@@ -142,14 +142,28 @@
           "id": "P4",
           "type": "prompt",
           "title": "Reconocer el identificador detrás de los bloques que agrega el entorno",
-          "status": "in_progress",
+          "status": "done",
           "estimate_min": [30, 50],
           "difficulty": 4,
-          "work_log": [],
-          "summary": "",
-          "steps": [],
-          "files_changed": 0,
-          "notes": ""
+          "work_log": [
+            {
+              "actor": "coding_agent",
+              "start": "2026-10-12T22:12:07-05:00",
+              "end": "2026-10-12T22:16:50-05:00",
+              "note": "",
+              "commits": ["4536896", "124c4df"]
+            }
+          ],
+          "summary": "tiempos reconoce el identificador aunque el entorno anteponga <browser_instruction> o envuelva el prompt en <pasted_content>.",
+          "steps": [
+            "firstLineOf: primera línea con contenido de todos los bloques de texto, saltando los bloques del entorno y la etiqueta de pasted_content",
+            "Pruebas del caso real de la extensión de VS Code, bloques en una línea, pegado vacío, etiqueta ajena y bloque sin cierre",
+            "8 mutaciones: 7 en rojo por aserción, 1 equivalente",
+            "Tablas de Monitor, lanzamiento-remitex y el kit idénticas antes y después; sin la entrada manual, el mensaje del kit se asigna solo",
+            "AGENTES.md (sección 6), PENDIENTES.md (resuelto) y PROJECT.md"
+          ],
+          "files_changed": 7,
+          "notes": "Pendiente de lanzamiento-remitex. Se quitó del kit la entrada de asignaciones.json del mensaje del 12 oct, que ya sobraba."
         }
       ]
     }

@@ -43,6 +43,12 @@ Prioridad: **alta** si da datos falsos o impide usar el kit; **media** si molest
 - **Qué pasa:** con `--sesiones` repetido se puede sumar la carpeta de otro proyecto (el kit lo necesitó porque F0 quedó en la de Monitor). Pero todos los mensajes de esa carpeta entran: los que traen un id que también existe en este plan («F1 · P2:», «F1 · P3:» de Monitor) abren ese item, y los que siguen sin identificador caen en él. Hoy se rodea con `null` en `asignaciones.mensajes`, mensaje por mensaje, o dejando de leer esa carpeta.
 - **Cómo reproducirlo:** en el kit, `pnpm tiempos --plan plan.json --sesiones <carpeta de Monitor> --sesiones <carpeta del kit>`: el P3 del kit recibe decenas de tramos del 11 oct.
 - **Prioridad:** baja. Mejora posible: acotar cada carpeta por fechas (por ejemplo `--sesiones <carpeta>@<desde>..<hasta>`), o leer de una carpeta ajena solo los mensajes que asigna `asignaciones.json`.
+### 2026-10-12 · tiempos no busca las sesiones en otra configuración de Claude Code (CLAUDE_CONFIG_DIR)
+
+- **Proyecto de origen:** plan-vivo (`C:\xampp\htdocs\plan-vivo`), revisión de un prompt para orquestadores.
+- **Qué pasa:** sin `--sesiones`, tiempos busca la carpeta del proyecto solo en `~/.claude/projects/`. Los proyectos de a client se trabajan con la cuenta corporativa, con otra configuración de Claude Code (`CLAUDE_CONFIG_DIR`), y sus sesiones quedan en `<CLAUDE_CONFIG_DIR>\projects\`. Ahí tiempos no las encuentra, y hay que pasarlas a mano con `--sesiones`.
+- **Cómo reproducirlo:** en un proyecto trabajado con `CLAUDE_CONFIG_DIR` apuntando a otra carpeta, correr `pnpm tiempos -- --plan <plan>` sin `--sesiones`: falla con «No encontré la carpeta de sesiones».
+- **Prioridad:** media. Mejora posible: si `CLAUDE_CONFIG_DIR` está definida, buscar primero en `<CLAUDE_CONFIG_DIR>\projects\`, y si no aparece ahí, en `~/.claude/projects/`; o buscar en ambas y avisar qué carpeta usó.
 
 ## Resueltos
 

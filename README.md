@@ -44,9 +44,9 @@ Nació en el proyecto server-monitor y aquí está separado para usarlo en cualq
 
 El visor tiene tema claro y textos en español e inglés (botones ES y EN). No tiene login ni API: lee el archivo local desde la ruta que le indiques.
 
-## Cómo se usa: una sola instalación
+## Cómo se usa: una sola instalación por máquina
 
-El kit vive en una sola carpeta, `C:\xampp\htdocs\plan-vivo`, y no se copia a ningún proyecto. Cada proyecto guarda solo su `plan.json` (y, si hace falta, su `asignaciones.json`). El visor, el script de tiempos, la validación y la migración se corren desde el kit, apuntando con `--plan` al plan del proyecto.
+En cada máquina, el kit vive en una sola carpeta (en Windows, `C:\xampp\htdocs\plan-vivo`; en la Mac, `/Users/<user>/plan-vivo`) y no se copia a ningún proyecto. Cada proyecto guarda solo su `plan.json` (y, si hace falta, su `asignaciones.json`). El visor, el script de tiempos, la validación y la migración se corren desde el kit, apuntando con `--plan` al plan del proyecto.
 
 ```
 C:\xampp\htdocs\
@@ -67,6 +67,18 @@ pnpm install
 ```
 
 Para ver el ejemplo: `pnpm visor` y entra a http://localhost:5190. La configuración que trae el kit apunta a `ejemplos/plan.json`.
+
+### Instalar el kit en la Mac
+
+El repositorio es privado: https://github.com/wx-quevedo/plan-vivo. En la Mac, con la sesión de GitHub iniciada (`gh auth login`):
+
+```
+git clone https://github.com/wx-quevedo/plan-vivo.git /Users/<user>/plan-vivo
+cd /Users/<user>/plan-vivo
+pnpm install
+```
+
+Para actualizarlo: `git pull` y `pnpm install` en esa carpeta. La copia de la Mac no se edita: el kit se cambia solo desde su sesión dueña, en Windows. Los comandos son los mismos, con la ruta de la Mac en `--dir` y en `--plan`; tiempos encuentra solo las sesiones de la Mac (`~/.claude/projects/`).
 
 ### Sumar un proyecto
 

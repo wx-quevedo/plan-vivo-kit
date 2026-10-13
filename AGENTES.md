@@ -2,7 +2,7 @@
 
 Este archivo es para ti, agente. El proyecto lleva su plan en `plan.json`, en su raíz, y tu trabajo es mantenerlo al día. La persona lo mira en el visor, que se recarga solo al guardar.
 
-El kit vive en una sola carpeta, `C:\xampp\htdocs\plan-vivo` (en adelante, «el kit»), y no se copia al proyecto: en el proyecto solo están `plan.json` y, si hace falta, `asignaciones.json`. Todos los comandos se corren desde el kit apuntando al plan del proyecto con `--plan` (sección 8).
+El kit vive en una sola carpeta por máquina (en adelante, «el kit»): en Windows, `C:\xampp\htdocs\plan-vivo`; en la Mac, `/Users/<user>/plan-vivo`, clonado de https://github.com/wx-quevedo/plan-vivo. Las rutas de este archivo son las de Windows; en la Mac, usa las equivalentes. El kit no se copia al proyecto: en el proyecto solo están `plan.json` y, si hace falta, `asignaciones.json`. Todos los comandos se corren desde el kit apuntando al plan del proyecto con `--plan` (sección 8).
 
 - **Formato exacto:** `C:\xampp\htdocs\plan-vivo\schema\plan.schema.json`.
 - **Ejemplo completo:** `C:\xampp\htdocs\plan-vivo\ejemplos\plan.json`.
@@ -250,4 +250,6 @@ Si encuentras un fallo del kit (el visor, tiempos, validar, migrar, el esquema o
 - dile a la persona, en una línea, que lo anotaste;
 - sigue con tu trabajo con un rodeo si lo hay, y anótalo en `notes` del item.
 
-El kit se corrige solo desde su propia sesión, en su carpeta.
+El kit se corrige solo desde su propia sesión, en su carpeta de Windows.
+
+En la Mac (o en cualquier copia clonada del repositorio) no edites ni hagas commit en el kit, tampoco en PENDIENTES.md: escribe la entrada con el mismo formato en tu respuesta y pídele a la persona que la pase al kit. Para actualizar la copia, `git pull` y `pnpm install` en su carpeta.

@@ -1,6 +1,6 @@
 # Bloque para el CLAUDE.md del proyecto
 
-Copia el bloque siguiente en el `CLAUDE.md` del proyecto. Supone que el kit está instalado en `C:\xampp\htdocs\plan-vivo` y que el plan del proyecto es `plan.json`, en su raíz. Cambia `<proyecto>` por la carpeta del proyecto; si el kit está en otra ruta, ajústala.
+Copia el bloque siguiente en el `CLAUDE.md` del proyecto. Supone que el kit está instalado en `C:\xampp\htdocs\plan-vivo` y que el plan del proyecto es `plan.json`, en su raíz. Cambia `<proyecto>` por la carpeta del proyecto. En la Mac, cambia también la ruta del kit por `/Users/<user>/plan-vivo` y la de los proyectos por la suya; ahí los fallos del kit no se anotan en PENDIENTES.md, se le pasan a la persona (ver la sección 9 de AGENTES.md).
 
 ```markdown
 ## Plan vivo (plan.json)

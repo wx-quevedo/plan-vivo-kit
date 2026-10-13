@@ -50,6 +50,27 @@ Prioridad: **alta** si da datos falsos o impide usar el kit; **media** si molest
 - **Cómo reproducirlo:** en un proyecto trabajado con `CLAUDE_CONFIG_DIR` apuntando a otra carpeta, correr `pnpm tiempos -- --plan <plan>` sin `--sesiones`: falla con «No encontré la carpeta de sesiones».
 - **Prioridad:** media. Mejora posible: si `CLAUDE_CONFIG_DIR` está definida, buscar primero en `<CLAUDE_CONFIG_DIR>\projects\`, y si no aparece ahí, en `~/.claude/projects/`; o buscar en ambas y avisar qué carpeta usó.
 
+### 2026-10-12 · Un subagente lanzado después de un mensaje en null cae en el item anterior
+
+- **Proyecto de origen:** visualizador-agentes (`E:\visualizador-agentes`), F4 · U3.
+- **Qué pasa:** `asignaciones.mensajes` con `null` cierra el item abierto, pero los subagentes no lo respetan: en `tiempos/src/tramos.ts` (línea 150) el item de un subagente se busca con `[...turnos].reverse().find((t) => t.at <= run.start && t.item !== null)`, que salta los turnos en null y toma el último item no nulo. Dos subagentes de una tarea ajena (excluida con null) quedaron como tramos de P39, hechos 11 h antes. Da datos falsos. Rodeo: `"subagentes": { "<id>": [] }` en `asignaciones.json`, que los deja sin asignar. Arreglo posible: tomar el último turno anterior al lanzamiento sin filtrar los null (si es null, el subagente no tiene item).
+- **Cómo reproducirlo:** una sesión con un mensaje de P1, después un mensaje con `null` en `asignaciones.mensajes` y, tras ese mensaje, un subagente. `pnpm tiempos -- --plan <plan>` muestra el subagente como tramo de P1.
+- **Prioridad:** alta.
+
+### 2026-10-12 · El $schema relativo no sirve si el proyecto está en otra unidad
+
+- **Proyecto de origen:** visualizador-agentes (`E:\visualizador-agentes`), F4 · U3.
+- **Qué pasa:** AGENTES.md pide `$schema` relativo a `plan.json` (`../plan-vivo/schema/plan.schema.json`), pero con el proyecto en `E:` y el kit en `C:` no hay ruta relativa posible. Se usó `file:///C:/xampp/htdocs/plan-vivo/schema/plan.schema.json`, que el esquema acepta (es un texto libre). AGENTES.md podría decirlo.
+- **Cómo reproducirlo:** crear `plan.json` en `E:\<proyecto>` con el kit en `C:\xampp\htdocs\plan-vivo`.
+- **Prioridad:** baja.
+
+### 2026-10-12 · Los commits de otra máquina que trabaja en paralelo se toman como evidencia del item abierto
+
+- **Proyecto de origen:** visualizador-agentes (`E:\visualizador-agentes`), F4 · U3.
+- **Qué pasa:** la evidencia de commits va por hora: un commit hecho en la Mac (P40) mientras la Alienware trabajaba en P41 aparece en el tramo de P41 (`76f10f8`, `e8c8f59`). En un proyecto con dos máquinas o dos agentes en paralelo, la columna de commits mezcla trabajos. Mejora posible: una excepción `commits` en `asignaciones.json` (hash → item, o null para no contarlo), o leer el identificador del item en el mensaje del commit.
+- **Cómo reproducirlo:** dos sesiones en máquinas distintas con commits intercalados al mismo repositorio; correr tiempos solo con las sesiones de una.
+- **Prioridad:** baja.
+
 ## Resueltos
 
 ### 2026-10-12 · El identificador del prompt no se reconoce si el entorno antepone un bloque al mensaje

@@ -3,7 +3,7 @@
   "schema_version": 1,
   "project": "plan-vivo",
   "title": "Plan vivo (kit)",
-  "updated_at": "2026-10-12T22:17:00-05:00",
+  "updated_at": "2026-10-12T23:30:00-05:00",
   "phases": [
     {
       "id": "F0",
@@ -149,9 +149,9 @@
             {
               "actor": "coding_agent",
               "start": "2026-10-12T22:12:07-05:00",
-              "end": "2026-10-12T22:16:50-05:00",
+              "end": "2026-10-12T22:17:27-05:00",
               "note": "",
-              "commits": ["4536896", "124c4df"]
+              "commits": ["4536896", "124c4df", "4b376e2"]
             }
           ],
           "summary": "tiempos reconoce el identificador aunque el entorno anteponga <browser_instruction> o envuelva el prompt en <pasted_content>.",
@@ -164,6 +164,60 @@
           ],
           "files_changed": 7,
           "notes": "Pendiente de lanzamiento-remitex. Se quitó del kit la entrada de asignaciones.json del mensaje del 12 oct, que ya sobraba."
+        },
+        {
+          "id": "P5",
+          "type": "prompt",
+          "title": "Prompt de adopción para orquestadores, skill en otra cuenta y fase con letra en el identificador",
+          "status": "done",
+          "estimate_min": null,
+          "difficulty": 3,
+          "work_log": [
+            {
+              "actor": "coding_agent",
+              "start": "2026-10-12T22:19:54-05:00",
+              "end": "2026-10-12T22:20:11-05:00",
+              "note": "",
+              "commits": []
+            },
+            {
+              "actor": "coding_agent",
+              "start": "2026-10-12T22:48:28-05:00",
+              "end": "2026-10-12T22:49:18-05:00",
+              "note": "",
+              "commits": ["6b046f3"]
+            },
+            {
+              "actor": "coding_agent",
+              "start": "2026-10-12T22:51:30-05:00",
+              "end": "2026-10-12T22:51:53-05:00",
+              "note": "",
+              "commits": []
+            },
+            {
+              "actor": "coding_agent",
+              "start": "2026-10-12T23:24:42-05:00",
+              "end": "2026-10-12T23:25:30-05:00",
+              "note": "",
+              "commits": ["5b4a2ac"]
+            },
+            {
+              "actor": "coding_agent",
+              "start": "2026-10-12T23:26:09-05:00",
+              "end": "2026-10-12T23:29:42-05:00",
+              "note": "",
+              "commits": ["ae4eff8", "bb0afbe"]
+            }
+          ],
+          "summary": "Prompt para que un orquestador en marcha adopte el plan vivo con todo su historial; zip de la skill para otra cuenta; el identificador acepta fases como M6b.",
+          "steps": [
+            "Prompt del orquestador sin marcadores, con las sugerencias de otro agente integradas y ajustadas",
+            "Pendiente nuevo: tiempos no busca sesiones en CLAUDE_CONFIG_DIR",
+            "Zip de la skill en Descargas y regla de CLAUDE.md para una copia por cuenta",
+            "Identificador: la fase admite una letra final (M6b · P2:), con su prueba y la mutación en rojo; tablas de Monitor, lanzamiento-remitex y el kit idénticas"
+          ],
+          "files_changed": 8,
+          "notes": "Sin estimado previo: fueron pedidos sueltos de la noche. La letra en la fase salió de la respuesta de un orquestador de otra cuenta, cuyo proyecto usa módulos M6b."
         }
       ]
     }

@@ -3,7 +3,7 @@
   "schema_version": 1,
   "project": "plan-vivo",
   "title": "Plan vivo (kit)",
-  "updated_at": "2026-10-12T22:10:00-05:00",
+  "updated_at": "2026-10-12T22:20:00-05:00",
   "phases": [
     {
       "id": "F0",
@@ -137,6 +137,19 @@
           ],
           "files_changed": 26,
           "notes": "La skill no cambia: su comando del visor sigue valiendo y ahora suma el plan si el visor está abierto. Imprevistos: una carrera en dos e2e (salida del visor) y la limpieza de carpetas temporales en Windows; y, al cargar tiempos, el «F1 · P3:» de Monitor chocaba con este P3, así que el kit ya no lee la carpeta de sesiones de Monitor (pendiente anotado). Los tramos cargados terminan antes del commit de cierre."
+        },
+        {
+          "id": "P4",
+          "type": "prompt",
+          "title": "Reconocer el identificador detrás de los bloques que agrega el entorno",
+          "status": "in_progress",
+          "estimate_min": [30, 50],
+          "difficulty": 4,
+          "work_log": [],
+          "summary": "",
+          "steps": [],
+          "files_changed": 0,
+          "notes": ""
         }
       ]
     }

@@ -16,8 +16,8 @@ const slug = (texto: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '') || 'plan'
 
-// Id a partir de la ruta: la carpeta del proyecto para un plan.json (C:\xampp\htdocs\server-monitor\plan.json queda
-// como server-monitor); con otro nombre de archivo, carpeta y archivo (ejemplos/plan-inicial.json: ejemplos-plan-inicial).
+// Id a partir de la ruta: la carpeta del proyecto para un plan.json (C:\proyectos\mi-proyecto\plan.json queda
+// como mi-proyecto); con otro nombre de archivo, carpeta y archivo (ejemplos/plan-inicial.json: ejemplos-plan-inicial).
 export function idPara(ruta: string): string {
   const archivo = basename(ruta, extname(ruta))
   const carpeta = basename(dirname(ruta))
@@ -48,7 +48,7 @@ export class PlanesDelVisor {
   private planes: PlanDelVisor[] = []
 
   // Agrega un plan; si ya estaba (la misma ruta), devuelve el que había. Dos proyectos con la misma carpeta final
-  // reciben ids distintos (server-monitor y server-monitor-2).
+  // reciben ids distintos (mi-proyecto y mi-proyecto-2).
   agregar(ruta: string): { plan: PlanDelVisor; nuevo: boolean } {
     const absoluta = resolve(ruta)
     const existente = this.planes.find((p) => mismaRuta(p.ruta, absoluta))

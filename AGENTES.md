@@ -2,11 +2,11 @@
 
 Este archivo es para ti, agente. El proyecto lleva su plan en `plan.json`, en su raíz, y tu trabajo es mantenerlo al día. La persona lo mira en el visor, que se recarga solo al guardar.
 
-El kit vive en una sola carpeta por máquina (en adelante, «el kit»): en Windows, `C:\xampp\htdocs\plan-vivo`; en la Mac, `/Users/<user>/plan-vivo`, clonado de https://github.com/wx-quevedo/plan-vivo. Las rutas de este archivo son las de Windows; en la Mac, usa las equivalentes. El kit no se copia al proyecto: en el proyecto solo están `plan.json` y, si hace falta, `asignaciones.json`. Todos los comandos se corren desde el kit apuntando al plan del proyecto con `--plan` (sección 8).
+El kit vive en una sola carpeta por máquina (en adelante, «el kit»): en Windows, por ejemplo, `C:\path\to\plan-vivo`; en la Mac, `~/plan-vivo`, clonado de https://github.com/wx-quevedo/plan-vivo. En este archivo, `<kit path>` es la carpeta del kit y `<project path>` la del proyecto; los ejemplos usan rutas de Windows, y en la Mac se usan las equivalentes. El kit no se copia al proyecto: en el proyecto solo están `plan.json` y, si hace falta, `asignaciones.json`. Todos los comandos se corren desde el kit apuntando al plan del proyecto con `--plan` (sección 8).
 
-- **Formato exacto:** `C:\xampp\htdocs\plan-vivo\schema\plan.schema.json`.
-- **Ejemplo completo:** `C:\xampp\htdocs\plan-vivo\ejemplos\plan.json`.
-- **Fallos o mejoras del kit:** no los arregles en el proyecto ni copies el kit; anótalos en `C:\xampp\htdocs\plan-vivo\PENDIENTES.md` (sección 9).
+- **Formato exacto:** `<kit path>\schema\plan.schema.json`.
+- **Ejemplo completo:** `<kit path>\ejemplos\plan.json`.
+- **Fallos o mejoras del kit:** no los arregles en el proyecto ni copies el kit; anótalos en `<kit path>\PENDIENTES.md` (sección 9).
 
 ## 1. Crear plan.json al empezar un proyecto
 
@@ -47,7 +47,7 @@ Créalo en la raíz del proyecto en cuanto haya un plan acordado con la persona,
 Reglas:
 
 - **schema_version:** versión del formato; la actual es 1. Va siempre. Si un plan no lo tiene, o es de una versión anterior, migra con `pnpm migrar` (sección 8).
-- **$schema:** ruta al esquema del kit relativa a `plan.json`, para que el editor valide y complete. Con el proyecto en `C:\xampp\htdocs\<proyecto>`, es `../plan-vivo/schema/plan.schema.json`.
+- **$schema:** ruta al esquema del kit relativa a `plan.json`, para que el editor valide y complete. Si el proyecto está en la misma carpeta padre que el kit, es `../plan-vivo/schema/plan.schema.json`.
 - **Ids de fase:** `F1`, `F2`, … en orden.
 - **Ids de item:** únicos en todo el plan.
   - `P` + número para los prompts;
@@ -226,11 +226,11 @@ Nunca corrijas el `work_log` a mano: si la regla no resuelve un caso, agrega la 
 Todos se corren desde el kit. Desde la carpeta del proyecto, sin moverte:
 
 ```
-pnpm --dir C:\xampp\htdocs\plan-vivo validar -- --plan C:\xampp\htdocs\<proyecto>\plan.json
-pnpm --dir C:\xampp\htdocs\plan-vivo tiempos -- --plan C:\xampp\htdocs\<proyecto>\plan.json
-pnpm --dir C:\xampp\htdocs\plan-vivo tiempos -- --plan C:\xampp\htdocs\<proyecto>\plan.json --aplicar
-pnpm --dir C:\xampp\htdocs\plan-vivo migrar -- --plan C:\xampp\htdocs\<proyecto>\plan.json
-pnpm --dir C:\xampp\htdocs\plan-vivo visor -- --plan C:\xampp\htdocs\<proyecto>\plan.json
+pnpm --dir <kit path> validar -- --plan <project path>\plan.json
+pnpm --dir <kit path> tiempos -- --plan <project path>\plan.json
+pnpm --dir <kit path> tiempos -- --plan <project path>\plan.json --aplicar
+pnpm --dir <kit path> migrar -- --plan <project path>\plan.json
+pnpm --dir <kit path> visor -- --plan <project path>\plan.json
 ```
 
 - Usa rutas absolutas. Con `pnpm --dir`, una relativa se resuelve desde la carpeta donde llamaste (el proyecto), así que `--plan plan.json` también funciona.
@@ -246,7 +246,7 @@ No copies el kit al proyecto ni crees un `plan-vivo.config.json` en el proyecto:
 Si encuentras un fallo del kit (el visor, tiempos, validar, migrar, el esquema o estas instrucciones) o una mejora que valdría para todos los proyectos:
 
 - no lo arregles en el proyecto, no copies el kit para parcharlo y no edites otros archivos del kit;
-- agrega una entrada al final de la sección «Abiertos» de `C:\xampp\htdocs\plan-vivo\PENDIENTES.md`, con el formato fijo del archivo: fecha, proyecto de origen, qué pasa, cómo reproducirlo y prioridad;
+- agrega una entrada al final de la sección «Abiertos» de `<kit path>\PENDIENTES.md`, con el formato fijo del archivo: fecha, proyecto de origen, qué pasa, cómo reproducirlo y prioridad;
 - dile a la persona, en una línea, que lo anotaste;
 - sigue con tu trabajo con un rodeo si lo hay, y anótalo en `notes` del item.
 

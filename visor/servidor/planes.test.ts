@@ -6,7 +6,7 @@ import { comprobarRuta, idPara, PlanesDelVisor } from './planes'
 
 describe('ids de los planes del visor', () => {
   it('un plan.json toma el nombre de su carpeta; otro archivo, carpeta y archivo', () => {
-    expect(idPara('C:\\xampp\\htdocs\\server-monitor\\plan.json')).toBe('server-monitor')
+    expect(idPara('C:\\xampp\\htdocs\\mi-proyecto\\plan.json')).toBe('mi-proyecto')
     expect(idPara('C:/xampp/htdocs/plan-vivo/ejemplos/plan-inicial.json')).toBe('ejemplos-plan-inicial')
     expect(idPara('/home/ana/Mi Proyecto_2/plan.json')).toBe('mi-proyecto-2')
     expect(idPara('/home/ana/Tráfico/plan.json')).toBe('trafico')
@@ -14,11 +14,11 @@ describe('ids de los planes del visor', () => {
 
   it('el mismo plan no se repite; dos carpetas con el mismo nombre reciben ids distintos', () => {
     const planes = new PlanesDelVisor()
-    expect(planes.agregar('C:/a/server-monitor/plan.json')).toEqual({ plan: { id: 'server-monitor', ruta: join('C:/a/server-monitor/plan.json') }, nuevo: true })
-    expect(planes.agregar('C:/a/server-monitor/plan.json').nuevo).toBe(false)
-    expect(planes.agregar('C:/b/server-monitor/plan.json').plan.id).toBe('server-monitor-2')
-    expect(planes.agregar('C:/c/server-monitor/plan.json').plan.id).toBe('server-monitor-3')
-    expect(planes.lista().map((p) => p.id)).toEqual(['server-monitor', 'server-monitor-2', 'server-monitor-3'])
+    expect(planes.agregar('C:/a/mi-proyecto/plan.json')).toEqual({ plan: { id: 'mi-proyecto', ruta: join('C:/a/mi-proyecto/plan.json') }, nuevo: true })
+    expect(planes.agregar('C:/a/mi-proyecto/plan.json').nuevo).toBe(false)
+    expect(planes.agregar('C:/b/mi-proyecto/plan.json').plan.id).toBe('mi-proyecto-2')
+    expect(planes.agregar('C:/c/mi-proyecto/plan.json').plan.id).toBe('mi-proyecto-3')
+    expect(planes.lista().map((p) => p.id)).toEqual(['mi-proyecto', 'mi-proyecto-2', 'mi-proyecto-3'])
   })
 
   it.runIf(process.platform !== 'linux')('en Windows y en la Mac, la misma ruta con otras mayúsculas es el mismo plan', () => {

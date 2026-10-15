@@ -34,12 +34,12 @@ describe('carga de plan.json desde el servidor del visor', () => {
 
 describe('varios planes en un visor', () => {
   const planes = [
-    { id: 'server-monitor', ruta: 'C:/a/server-monitor/plan.json' },
+    { id: 'mi-proyecto', ruta: 'C:/a/mi-proyecto/plan.json' },
     { id: 'plan-vivo', ruta: 'C:/a/plan-vivo/plan.json' },
   ]
 
   it('sin ?plan= se ve el primero; con ?plan=<id>, ese; con un id que no está, ninguno', () => {
-    expect(elegirPlan(planes, null)?.id).toBe('server-monitor')
+    expect(elegirPlan(planes, null)?.id).toBe('mi-proyecto')
     expect(elegirPlan(planes, 'plan-vivo')?.id).toBe('plan-vivo')
     expect(elegirPlan(planes, 'otro')).toBeUndefined()
     expect(elegirPlan([], null)).toBeUndefined()

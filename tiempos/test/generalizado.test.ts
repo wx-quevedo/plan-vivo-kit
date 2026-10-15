@@ -1,4 +1,4 @@
-// Lo que cambió al sacar el script de server-monitor: zona horaria, identificador, asignaciones opcionales y rutas.
+// Lo que cambió al sacar el script del proyecto de origen: zona horaria, identificador, asignaciones opcionales y rutas.
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -112,8 +112,8 @@ describe('tramos del orquestador cargados a mano', () => {
 
 describe('carpeta de sesiones de Claude Code', () => {
   it('cada carácter que no es letra o número se cambia por un guion', () => {
-    expect(nombreDeCarpeta('C:\\xampp\\htdocs\\server-monitor')).toBe('c--xampp-htdocs-server-monitor')
-    expect(nombreDeCarpeta('C:/xampp/htdocs/server-monitor')).toBe('c--xampp-htdocs-server-monitor')
+    expect(nombreDeCarpeta('C:\\xampp\\htdocs\\mi-proyecto')).toBe('c--xampp-htdocs-mi-proyecto')
+    expect(nombreDeCarpeta('C:/xampp/htdocs/mi-proyecto')).toBe('c--xampp-htdocs-mi-proyecto')
     expect(nombreDeCarpeta('/home/ana/mi_app.v2')).toBe('-home-ana-mi-app-v2')
   })
 

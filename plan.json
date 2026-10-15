@@ -12,7 +12,7 @@
         {
           "id": "P1",
           "type": "prompt",
-          "title": "Exportar el plan vivo de server-monitor como kit reutilizable",
+          "title": "Exportar el plan vivo del proyecto de origen como kit reutilizable",
           "status": "done",
           "estimate_min": null,
           "difficulty": 6,
@@ -34,16 +34,16 @@
           ],
           "summary": "Repositorio nuevo con el visor independiente, el script de tiempos generalizado, el esquema, el ejemplo, las guías y el zip.",
           "steps": [
-            "Visor copiado de Monitor como app React + Vite: plan.json por ruta configurable, recarga al guardar, ES/EN",
+            "Visor copiado del proyecto de origen como app React + Vite: plan.json por ruta configurable, recarga al guardar, ES/EN",
             "Script de tiempos generalizado: configuración, zona horaria, identificador, asignaciones.json opcional",
             "schema/plan.schema.json probado en paralelo con zod; ejemplos/plan.json y plan-inicial.json",
             "README.md, AGENTES.md, snippet-claude.md y capturas en docs/capturas/",
             "Pruebas: 70 del visor, 30 de tiempos, 8 e2e (incluye el kit copiado a una carpeta vacía); 23 mutaciones en rojo",
-            "Zip plan-vivo-kit.zip verificado; nota y decisión D37 en PROJECT.md de server-monitor",
+            "Zip plan-vivo-kit.zip verificado; nota y decisión D37 en el PROJECT.md del proyecto de origen",
             "Plan propio del kit (este archivo) con sus tramos cargados por pnpm tiempos"
           ],
           "files_changed": 76,
-          "notes": "Sin estimado previo: fue una tarea aparte, fuera del plan de server-monitor. Defectos encontrados y corregidos: la recarga perdía el segundo de dos guardados seguidos en Windows (ahora fs.watchFile), y --aplicar borraba los tramos del orquestador (ahora se conservan). La sesión de Claude Code es la de server-monitor: tiempos corre con --sesiones apuntando a esa carpeta, y los mensajes de Monitor quedan sin asignar aquí."
+          "notes": "Sin estimado previo: fue una tarea aparte, fuera del plan del proyecto de origen. Defectos encontrados y corregidos: la recarga perdía el segundo de dos guardados seguidos en Windows (ahora fs.watchFile), y --aplicar borraba los tramos del orquestador (ahora se conservan). La sesión de Claude Code es la del proyecto de origen: tiempos corre con --sesiones apuntando a esa carpeta, y los mensajes de ese proyecto quedan sin asignar aquí."
         }
       ]
     },
@@ -96,11 +96,11 @@
             "tiempos: repositorio sin commits y null en asignaciones.mensajes para excluir mensajes de otro proyecto",
             "README.md, AGENTES.md (secciones 8 y 9) y snippet-claude.md con la regla K4",
             "Pruebas: 55 de tiempos, 85 del visor, 9 e2e (plan fuera del kit con pnpm --dir); 38 mutaciones en rojo por aserción",
-            "Monitor en solo lectura: visor con su plan (captura) y tabla de tiempos idéntica, 95 igual; sha256 sin cambios",
+            "Proyecto de origen en solo lectura: visor con su plan (captura) y tabla de tiempos idéntica, 95 igual; sha256 sin cambios",
             "autoskills --dry-run: 12 skills propuestas, nada instalado; zip regenerado sin plan, asignaciones, .bak ni node_modules"
           ],
           "files_changed": 32,
-          "notes": "Imprevisto dentro de P2: al leer también la carpeta de sesiones de Monitor, su mensaje «F1 · P2:» del 11 oct chocaba con el P2 del kit; se agregó null en asignaciones.mensajes. El primer mensaje de esta sesión empieza con un bloque pegado, sin identificador: va a P2 por asignaciones.json. Falta que Washington confirme los detalles del incidente de la carpeta borrada."
+          "notes": "Imprevisto dentro de P2: al leer también la carpeta de sesiones del proyecto de origen, su mensaje «F1 · P2:» del 11 oct chocaba con el P2 del kit; se agregó null en asignaciones.mensajes. El primer mensaje de esta sesión empieza con un bloque pegado, sin identificador: va a P2 por asignaciones.json. Falta que Washington confirme los detalles del incidente de la carpeta borrada."
         },
         {
           "id": "P3",
@@ -132,11 +132,11 @@
             "Selector de planes (ES y EN), recarga por plan y aviso de plan desconocido",
             "POST protegido con la cabecera X-Plan-Vivo y ruta absoluta a un .json que exista",
             "Pruebas: 59 de tiempos, 94 del visor, 11 e2e; 20 mutaciones en rojo por aserción",
-            "Verificado en 5190 con el plan del kit y el de Monitor sumado desde su carpeta",
+            "Verificado en 5190 con el plan del kit y el del proyecto de origen sumado desde su carpeta",
             "README, AGENTES, snippet, CLAUDE.md (aviso de cambios que tocan la skill) y PROJECT.md (K8)"
           ],
           "files_changed": 26,
-          "notes": "La skill no cambia: su comando del visor sigue valiendo y ahora suma el plan si el visor está abierto. Imprevistos: una carrera en dos e2e (salida del visor) y la limpieza de carpetas temporales en Windows; y, al cargar tiempos, el «F1 · P3:» de Monitor chocaba con este P3, así que el kit ya no lee la carpeta de sesiones de Monitor (pendiente anotado). Los tramos cargados terminan antes del commit de cierre."
+          "notes": "La skill no cambia: su comando del visor sigue valiendo y ahora suma el plan si el visor está abierto. Imprevistos: una carrera en dos e2e (salida del visor) y la limpieza de carpetas temporales en Windows; y, al cargar tiempos, el «F1 · P3:» del proyecto de origen chocaba con este P3, así que el kit ya no lee la carpeta de sesiones de ese proyecto (pendiente anotado). Los tramos cargados terminan antes del commit de cierre."
         },
         {
           "id": "P4",
@@ -159,7 +159,7 @@
             "firstLineOf: primera línea con contenido de todos los bloques de texto, saltando los bloques del entorno y la etiqueta de pasted_content",
             "Pruebas del caso real de la extensión de VS Code, bloques en una línea, pegado vacío, etiqueta ajena y bloque sin cierre",
             "8 mutaciones: 7 en rojo por aserción, 1 equivalente",
-            "Tablas de Monitor, lanzamiento-remitex y el kit idénticas antes y después; sin la entrada manual, el mensaje del kit se asigna solo",
+            "Tablas del proyecto de origen, lanzamiento-remitex y el kit idénticas antes y después; sin la entrada manual, el mensaje del kit se asigna solo",
             "AGENTES.md (sección 6), PENDIENTES.md (resuelto) y PROJECT.md"
           ],
           "files_changed": 7,
@@ -214,7 +214,7 @@
             "Prompt del orquestador sin marcadores, con las sugerencias de otro agente integradas y ajustadas",
             "Pendiente nuevo: tiempos no busca sesiones en CLAUDE_CONFIG_DIR",
             "Zip de la skill en Descargas y regla de CLAUDE.md para una copia por cuenta",
-            "Identificador: la fase admite una letra final (M6b · P2:), con su prueba y la mutación en rojo; tablas de Monitor, lanzamiento-remitex y el kit idénticas"
+            "Identificador: la fase admite una letra final (M6b · P2:), con su prueba y la mutación en rojo; tablas del proyecto de origen, lanzamiento-remitex y el kit idénticas"
           ],
           "files_changed": 8,
           "notes": "Sin estimado previo: fueron pedidos sueltos de la noche. La letra en la fase salió de la respuesta de un orquestador de otra cuenta, cuyo proyecto usa módulos M6b."

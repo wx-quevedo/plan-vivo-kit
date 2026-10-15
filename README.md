@@ -2,8 +2,6 @@
 
 A project plan kept in one JSON file. AI coding agents keep it up to date, and a local live viewer shows phases, real time spent per actor, and a calibrated projection of when the work will finish.
 
-Spanish version of the original documentation: [docs/README.es.md](docs/README.es.md).
-
 ## What problem it solves
 
 When most of a project is built by AI coding agents, it gets hard to answer simple questions: what is done, what is waiting on me, how long each step really took compared to the estimate, and when the work will finish. Plan Vivo answers them from a single `plan.json` that lives in each project:

@@ -2,7 +2,7 @@
 
 Este archivo es para ti, agente. El proyecto lleva su plan en `plan.json`, en su raíz, y tu trabajo es mantenerlo al día. La persona lo mira en el visor, que se recarga solo al guardar.
 
-El kit vive en una sola carpeta por máquina (en adelante, «el kit»): en Windows, por ejemplo, `C:\path\to\plan-vivo`; en la Mac, `~/plan-vivo`, clonado de https://github.com/wx-quevedo/plan-vivo. En este archivo, `<kit path>` es la carpeta del kit y `<project path>` la del proyecto; los ejemplos usan rutas de Windows, y en la Mac se usan las equivalentes. El kit no se copia al proyecto: en el proyecto solo están `plan.json` y, si hace falta, `asignaciones.json`. Todos los comandos se corren desde el kit apuntando al plan del proyecto con `--plan` (sección 8).
+El kit vive en una sola carpeta por máquina (en adelante, «el kit»): en Windows, por ejemplo, `C:\path\to\plan-vivo`; en la Mac, `~/plan-vivo`, clonado de https://github.com/wx-quevedo/plan-vivo-kit. En este archivo, `<kit path>` es la carpeta del kit y `<project path>` la del proyecto; los ejemplos usan rutas de Windows, y en la Mac se usan las equivalentes. El kit no se copia al proyecto: en el proyecto solo están `plan.json` y, si hace falta, `asignaciones.json`. Todos los comandos se corren desde el kit apuntando al plan del proyecto con `--plan` (sección 8).
 
 - **Formato exacto:** `<kit path>\schema\plan.schema.json`.
 - **Ejemplo completo:** `<kit path>\ejemplos\plan.json`.

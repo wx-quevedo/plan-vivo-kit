@@ -10,7 +10,7 @@ Este repositorio es el kit plan vivo: esquema de `plan.json`, visor, script de t
 
 ## Git
 
-- Commits locales. `git push` solo a `origin` (https://github.com/wx-quevedo/plan-vivo, privado), y solo cuando Washington lo pida. Nunca pull requests ni otros remotos.
+- Commits locales. `git push` solo a `origin` (https://github.com/wx-quevedo/plan-vivo-kit), y solo cuando Washington lo pida. Nunca pull requests ni otros remotos.
 - Cada commit con rutas explícitas (`git commit -- <rutas>` o `git add <rutas>`), nunca `git add -A` ni `git add .`.
 - Washington es el único autor. Sin líneas `Co-Authored-By` ni ninguna atribución a Claude en commits o archivos.
 

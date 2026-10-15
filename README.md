@@ -93,8 +93,8 @@ Map with a "you are here" marker on the current phase:
 Requirements: Node.js 24, pnpm 11, git. Google Chrome is needed only for the end-to-end tests.
 
 ```bash
-git clone https://github.com/wx-quevedo/plan-vivo.git
-cd plan-vivo
+git clone https://github.com/wx-quevedo/plan-vivo-kit.git
+cd plan-vivo-kit
 pnpm install
 
 # Viewer with the bundled example plan, at http://localhost:5190

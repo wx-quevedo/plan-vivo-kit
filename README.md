@@ -132,7 +132,7 @@ To start a new plan, copy `ejemplos/plan-inicial.json` into your project as `pla
 
 ## Author
 
-Washington Quevedo
+Washington X. Quevedo
 
 - LinkedIn: https://www.linkedin.com/in/wxquevedo
 - GitHub: https://github.com/wx-quevedo
